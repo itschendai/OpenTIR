@@ -1,0 +1,231 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-06-04T08:24:56.578+00:00",
+  "reference_type": "charuco_board_to_key_position_tcp",
+  "description": "Rigid transform from the detected ChArUco board frame to the saved TCP pose for the Vise_accurate key position.",
+  "frame_convention": "T_a_b maps coordinates from frame b into frame a",
+  "board": {
+    "name": "tag_01",
+    "path": "project/calibration/tag_01.yaml"
+  },
+  "calibration": {
+    "path": "project/calibration/camera_tcp.yaml"
+  },
+  "source_key_position": {
+    "name": "Vise_accurate",
+    "path": "project/key_positions/Vise_accurate.json",
+    "robot_sn": "Rizon4-062930"
+  },
+  "capture_robot_tcp_pose_world": {
+    "unit": "m, quaternion",
+    "order": [
+      "x",
+      "y",
+      "z",
+      "qw",
+      "qx",
+      "qy",
+      "qz"
+    ],
+    "values": [
+      0.3722931742668152,
+      -0.5684216022491455,
+      0.19698283076286316,
+      0.34670937061309814,
+      0.3385632336139679,
+      0.8685866594314575,
+      -0.1035604402422905
+    ]
+  },
+  "transforms": {
+    "T_world_board": {
+      "from_frame": "world",
+      "to_frame": "board",
+      "convention": "matrix maps homogeneous coordinates from to_frame into from_frame",
+      "matrix": [
+        [
+          -0.7390626953891584,
+          -0.6733644159312987,
+          0.019149298723793576,
+          0.5181360869635577
+        ],
+        [
+          -0.6734726079987973,
+          0.739211427539176,
+          0.001054357999884617,
+          -0.6639097897274088
+        ],
+        [
+          -0.014865347604764234,
+          -0.012117291487561554,
+          -0.9998160794304094,
+          0.09571586320285103
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "translation_m": [
+        0.5181360869635577,
+        -0.6639097897274088,
+        0.09571586320285103
+      ],
+      "quaternion_wxyz": [
+        0.009119384842302757,
+        -0.361089309071203,
+        0.9324819304360198,
+        -0.0029659913845472624
+      ]
+    },
+    "T_world_keypos_tcp_reference": {
+      "from_frame": "world",
+      "to_frame": "keypos_tcp",
+      "convention": "matrix maps homogeneous coordinates from to_frame into from_frame",
+      "matrix": [
+        [
+          -0.0,
+          0.720205991573054,
+          0.6937602825921027,
+          0.2984571158885956
+        ],
+        [
+          -0.0,
+          0.6937602825921027,
+          -0.720205991573054,
+          -0.785201907157898
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          0.3579076826572418
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "translation_m": [
+        0.2984571158885956,
+        -0.785201907157898,
+        0.3579076826572418
+      ],
+      "quaternion_wxyz": [
+        0.6507227294693383,
+        0.2766946500241274,
+        0.6507227294693384,
+        -0.2766946500241274
+      ]
+    },
+    "T_board_keypos_tcp": {
+      "from_frame": "board",
+      "to_frame": "keypos_tcp",
+      "convention": "matrix maps homogeneous coordinates from to_frame into from_frame",
+      "matrix": [
+        [
+          0.014865347604764234,
+          -0.9995059282106887,
+          -0.02769333696539906,
+          0.2401458786032713
+        ],
+        [
+          0.012117291487561554,
+          0.02787444199907901,
+          -0.9995379866369489,
+          0.055086428073256144
+        ],
+        [
+          0.9998160794304094,
+          0.014522911379251565,
+          0.012525667945279739,
+          -0.26647818054040057
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "translation_m": [
+        0.2401458786032713,
+        0.055086428073256144,
+        -0.26647818054040057
+      ],
+      "quaternion_wxyz": [
+        0.5136305718970403,
+        0.49357502916486923,
+        -0.5001208420094675,
+        0.49238853518878684
+      ]
+    },
+    "T_keypos_tcp_board": {
+      "from_frame": "keypos_tcp",
+      "to_frame": "board",
+      "convention": "matrix maps homogeneous coordinates from to_frame into from_frame",
+      "matrix": [
+        [
+          0.014865347604764234,
+          0.012117291487561554,
+          0.9998160794304094,
+          0.26219181945439074
+        ],
+        [
+          -0.9995059282106887,
+          0.02787444199907901,
+          0.014522911379251565,
+          0.24236176485556207
+        ],
+        [
+          -0.02769333696539906,
+          -0.9995379866369489,
+          0.012525667945279739,
+          0.06504923534848712
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "translation_m": [
+        0.26219181945439074,
+        0.24236176485556207,
+        0.06504923534848712
+      ],
+      "quaternion_wxyz": [
+        0.5136305718970403,
+        -0.49357502916486923,
+        0.5001208420094675,
+        -0.49238853518878684
+      ]
+    }
+  },
+  "reference_tcp_pose_world": {
+    "unit": "m, quaternion",
+    "order": [
+      "x",
+      "y",
+      "z",
+      "qw",
+      "qx",
+      "qy",
+      "qz"
+    ],
+    "values": [
+      0.2984571158885956,
+      -0.785201907157898,
+      0.3579076826572418,
+      0.6507227294693383,
+      0.2766946500241274,
+      0.6507227294693384,
+      -0.2766946500241274
+    ]
+  }
+}

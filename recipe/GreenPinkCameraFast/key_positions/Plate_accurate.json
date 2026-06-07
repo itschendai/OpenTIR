@@ -1,0 +1,59 @@
+{
+  "name": "Plate_accurate",
+  "timestamp": "2026-06-01T21:10:17.066-07:00",
+  "robot_sn": "Rizon4-062930",
+  "joint_group": null,
+  "floating_enabled": false,
+  "floating_mode": null,
+  "floating_joints": [],
+  "floating_axes": [],
+  "tcp_pose_world": {
+    "unit": "m, quaternion",
+    "order": [
+      "x",
+      "y",
+      "z",
+      "qw",
+      "qx",
+      "qy",
+      "qz"
+    ],
+    "values": [
+      0.7878413200378418,
+      -0.01563531532883644,
+      0.05955350399017334,
+      -0.0065494561567902565,
+      0.016285382211208344,
+      0.9998435974121094,
+      -0.002171100815758109
+    ]
+  },
+  "joint_angles_rad": [
+    -0.17334339022636414,
+    -1.1575363874435425,
+    0.47291645407676697,
+    1.1835229396820068,
+    -0.5479468107223511,
+    0.6296170353889465,
+    0.41546016931533813
+  ],
+  "joint_angles_deg": [
+    -9.931844666459948,
+    -66.32194963333504,
+    27.096116880891163,
+    67.8108694006953,
+    -31.39503965204448,
+    36.07439883732563,
+    23.804114257559466
+  ],
+  "gripper_status": {
+    "name": "Flexiv-GN01",
+    "last_command": "initialized",
+    "width_m": 0.0,
+    "force_n": 26.059999465942383,
+    "is_moving": false
+  },
+  "record_type": "key_position",
+  "key_position_name": "Plate_accurate",
+  "source_trajectory_name": "trajectory_waypoints"
+}

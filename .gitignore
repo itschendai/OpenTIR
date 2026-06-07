@@ -1,0 +1,33 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+ENV/
+
+# --- Large data: videos ---
+*.mp4
+*.avi
+*.mov
+
+# --- Large data: calibration image captures (regenerable) ---
+calibration/captures/
+calibration/samples/
+calibration/holdout/
+
+# --- Backups / scratch ---
+*.bak
+*.tmp
+*.log
+
+# --- OS / editor cruft ---
+.DS_Store
+Thumbs.db
+*.swp

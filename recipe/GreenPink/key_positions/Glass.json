@@ -1,0 +1,59 @@
+{
+  "name": "Glass",
+  "timestamp": "2026-05-22T19:19:30.821-07:00",
+  "robot_sn": "Rizon4-062930",
+  "joint_group": null,
+  "floating_enabled": false,
+  "floating_mode": null,
+  "floating_joints": [],
+  "floating_axes": [],
+  "tcp_pose_world": {
+    "unit": "m, quaternion",
+    "order": [
+      "x",
+      "y",
+      "z",
+      "qw",
+      "qx",
+      "qy",
+      "qz"
+    ],
+    "values": [
+      0.532907247543335,
+      0.6159288883209229,
+      0.20957766473293304,
+      0.5002807974815369,
+      -0.4993908405303955,
+      0.498832643032074,
+      0.5014917254447937
+    ]
+  },
+  "joint_angles_rad": [
+    -2.1478769779205322,
+    1.0622708797454834,
+    2.2687432765960693,
+    1.3723779916763306,
+    2.4174389839172363,
+    -0.021490607410669327,
+    -2.037834644317627
+  ],
+  "joint_angles_deg": [
+    -123.0642857481604,
+    60.86363810906521,
+    129.98941454763633,
+    78.63146681969377,
+    138.50905100885174,
+    -1.2313211038039227,
+    -116.75932446494329
+  ],
+  "gripper_status": {
+    "name": "Flexiv-GN01",
+    "last_command": "initialized",
+    "width_m": 0.03156000003218651,
+    "force_n": -0.2800000011920929,
+    "is_moving": false
+  },
+  "record_type": "key_position",
+  "key_position_name": "Glass",
+  "source_trajectory_name": "trajectory_waypoints"
+}

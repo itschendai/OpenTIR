@@ -1,0 +1,67 @@
+schema_version: 1
+trainer_version: "test-fixture"
+robot_sn: "Rizon4-062930"
+captured_at: "2026-05-19T11:30:00-07:00"
+
+# Deliberately missing: `safe_intermediate` pose and `disposal_to_home` path.
+poses:
+  home:
+    q_rad: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    q_deg: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    tcp_pose_world:
+      order: ["x", "y", "z", "qw", "qx", "qy", "qz"]
+      values: [0.4, 0.0, 0.5, 1.0, 0.0, 0.0, 0.0]
+    gripper_state: { width_m: 0.04, force_n: 0.0 }
+  pickup_pre_grasp:
+    q_rad: [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+    q_deg: [5.7, 5.7, 5.7, 5.7, 5.7, 5.7, 5.7]
+    tcp_pose_world:
+      order: ["x", "y", "z", "qw", "qx", "qy", "qz"]
+      values: [0.5, 0.1, 0.3, 1.0, 0.0, 0.0, 0.0]
+    gripper_state: { width_m: 0.04, force_n: 0.0 }
+  pickup_grasp:
+    q_rad: [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.2]
+    q_deg: [5.7, 5.7, 5.7, 5.7, 5.7, 5.7, 11.4]
+    tcp_pose_world:
+      order: ["x", "y", "z", "qw", "qx", "qy", "qz"]
+      values: [0.5, 0.1, 0.2, 1.0, 0.0, 0.0, 0.0]
+    gripper_state: { width_m: 0.0, force_n: 5.0 }
+  pickup_lifted:
+    q_rad: [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.2]
+    q_deg: [5.7, 5.7, 5.7, 5.7, 5.7, 5.7, 11.4]
+    tcp_pose_world:
+      order: ["x", "y", "z", "qw", "qx", "qy", "qz"]
+      values: [0.5, 0.1, 0.25, 1.0, 0.0, 0.0, 0.0]
+    gripper_state: { width_m: 0.0, force_n: 5.0 }
+  above_vise:
+    q_rad: [-0.1, 0.2, 0.0, 0.3, 0.0, -0.2, 0.1]
+    q_deg: [-5.7, 11.4, 0.0, 17.2, 0.0, -11.4, 5.7]
+    tcp_pose_world:
+      order: ["x", "y", "z", "qw", "qx", "qy", "qz"]
+      values: [0.6, -0.1, 0.35, 1.0, 0.0, 0.0, 0.0]
+    gripper_state: { width_m: 0.0, force_n: 5.0 }
+  disposal:
+    q_rad: [0.5, 0.2, 0.0, 0.4, 0.0, -0.3, 0.1]
+    q_deg: [28.6, 11.4, 0.0, 22.9, 0.0, -17.2, 5.7]
+    tcp_pose_world:
+      order: ["x", "y", "z", "qw", "qx", "qy", "qz"]
+      values: [0.4, -0.3, 0.4, 1.0, 0.0, 0.0, 0.0]
+    gripper_state: { width_m: 0.04, force_n: 0.0 }
+
+paths:
+  lifted_to_above_vise:
+    from: pickup_lifted
+    to: above_vise
+    waypoints: []
+  above_vise_to_safe_intermediate:
+    from: above_vise
+    to: safe_intermediate
+    waypoints: []
+  safe_intermediate_to_above_vise:
+    from: safe_intermediate
+    to: above_vise
+    waypoints: []
+  above_vise_to_disposal:
+    from: above_vise
+    to: disposal
+    waypoints: []

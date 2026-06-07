@@ -1,0 +1,61 @@
+{
+  "name": "Inter",
+  "timestamp": "2026-05-22T16:33:45.261-07:00",
+  "robot_sn": "Rizon4-062930",
+  "joint_group": null,
+  "floating_enabled": true,
+  "floating_mode": "cartesian",
+  "floating_joints": [],
+  "floating_axes": [
+    "z"
+  ],
+  "tcp_pose_world": {
+    "unit": "m, quaternion",
+    "order": [
+      "x",
+      "y",
+      "z",
+      "qw",
+      "qx",
+      "qy",
+      "qz"
+    ],
+    "values": [
+      0.1816282570362091,
+      -0.1938580423593521,
+      0.5271375775337219,
+      0.49999433755874634,
+      -0.5000002980232239,
+      0.500004231929779,
+      0.5000011324882507
+    ]
+  },
+  "joint_angles_rad": [
+    -2.2686750888824463,
+    -1.0701686143875122,
+    1.6583877801895142,
+    1.6553775072097778,
+    0.5261872410774231,
+    -0.5915718078613281,
+    -1.5279474258422852
+  ],
+  "joint_angles_deg": [
+    -129.9855076794311,
+    -61.31614497176772,
+    95.01862060092843,
+    94.84614466400727,
+    30.14830814736913,
+    -33.89456786937816,
+    -87.54493881864127
+  ],
+  "gripper_status": {
+    "name": "Flexiv-GN01",
+    "last_command": "initialized",
+    "width_m": 0.03158999979496002,
+    "force_n": -0.019999999552965164,
+    "is_moving": false
+  },
+  "record_type": "key_position",
+  "key_position_name": "Inter",
+  "source_trajectory_name": "trajectory_waypoints"
+}

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenTIR — Cutting Cell</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Open<b>TIR</b></span>
+      <span class="brand-sub">Cutting Cell</span>
+    </div>
+    <div id="op-banner" class="op-banner idle">idle</div>
+    <button id="estop" class="estop">Stop All</button>
+  </header>
+
+  <main class="grid">
+    <!-- 3. Live camera -->
+    <section class="panel" id="panel-camera">
+      <h2>Camera (RGB)</h2>
+      <img id="camera" src="/api/camera/stream" alt="live camera" />
+    </section>
+
+    <!-- 4. Robot status -->
+    <section class="panel" id="panel-robot-status">
+      <h2>Robot Status</h2>
+      <div class="status-line">
+        <span id="robot-state" class="pill">—</span>
+      </div>
+      <table class="kv">
+        <tbody>
+          <tr><th>Joints (deg)</th><td id="joints">—</td></tr>
+          <tr><th>TCP pos (m)</th><td id="tcp-pos">—</td></tr>
+          <tr><th>TCP rpy (deg)</th><td id="tcp-rpy">—</td></tr>
+          <tr><th>Gripper</th><td id="gripper">—</td></tr>
+          <tr><th>Floating</th><td id="floating-state">—</td></tr>
+          <tr><th>Wrench (N/Nm)</th><td id="wrench">—</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 2. Robot control -->
+    <section class="panel" id="panel-robot-control">
+      <h2>Robot Control</h2>
+      <div class="row">
+        <select id="waypoint-select"></select>
+        <button class="btn primary" data-act="robot-move">Move to</button>
+      </div>
+      <div class="row">
+        <button class="btn" data-act="robot-home">Home</button>
+        <button class="btn" data-act="robot-zero-ft">Cali (Zero F/T)</button>
+        <button class="btn" data-act="robot-clear-fault">Clear Fault</button>
+      </div>
+      <div class="row">
+        <button class="btn" data-act="gripper-open">Gripper Open</button>
+        <button class="btn" data-act="gripper-close">Gripper Close</button>
+      </div>
+      <div class="row">
+        <span class="label">Float:</span>
+        <button class="btn" data-act="float-cart-on">Cartesian On</button>
+        <button class="btn" data-act="float-joint-on">Joint On</button>
+        <button class="btn" data-act="float-off">Off (Hold)</button>
+      </div>
+    </section>
+
+    <!-- 5. Machine interface -->
+    <section class="panel" id="panel-machine-status">
+      <h2>Machine (Vise / X-Z / Rotary)</h2>
+      <table class="kv">
+        <tbody>
+          <tr><th>X stage (mm)</th><td id="m-x">—</td></tr>
+          <tr><th>Z stage (mm)</th><td id="m-z">—</td></tr>
+          <tr><th>Rotary (deg)</th><td id="m-rot">—</td></tr>
+          <tr><th>Vise</th><td id="m-vise">—</td></tr>
+          <tr><th>Force (kg)</th><td id="m-force">—</td></tr>
+          <tr><th>Blade</th><td id="m-blade">—</td></tr>
+          <tr><th>State</th><td id="m-state">—</td></tr>
+        </tbody>
+      </table>
+      <div class="row">
+        <button class="btn" data-act="machine-home">Home All</button>
+        <button class="btn" data-act="vise-close">Close Vise</button>
+        <button class="btn" data-act="vise-open">Open Vise</button>
+      </div>
+      <div class="row">
+        <input type="number" id="x-mm" placeholder="X mm" step="0.5" />
+        <button class="btn" data-act="move-x">Move X</button>
+        <input type="number" id="z-mm" placeholder="Z mm" step="0.5" />
+        <button class="btn" data-act="move-z">Move Z</button>
+      </div>
+      <div class="row">
+        <input type="number" id="rot-deg" placeholder="deg" step="1" />
+        <button class="btn" data-act="rotate">Rotate</button>
+      </div>
+    </section>
+
+    <!-- 6. Cutting machine control -->
+    <section class="panel" id="panel-cutter">
+      <h2>Cutting Machine</h2>
+      <div class="row">
+        <button class="btn" data-act="blade-on">Blade On</button>
+        <button class="btn" data-act="blade-off">Blade Off</button>
+      </div>
+      <div class="row">
+        <input type="number" id="cut-z" placeholder="Z mm" step="0.5" />
+        <input type="number" id="cut-x" placeholder="X mm" step="0.5" />
+        <input type="number" id="cut-deg" placeholder="deg" step="1" />
+      </div>
+      <div class="row">
+        <button class="btn danger" data-act="cut">Run Cut</button>
+        <button class="btn" data-act="machine-clear">Clear Faults</button>
+      </div>
+    </section>
+
+    <!-- 1. Recipe -->
+    <section class="panel wide" id="panel-recipe">
+      <h2>Recipe</h2>
+      <div class="row">
+        <select id="recipe-select"></select>
+        <button class="btn" data-act="recipe-load">Load</button>
+      </div>
+      <div class="row">
+        <span class="label">Speed</span>
+        <input type="range" id="speed" min="0.1" max="1.0" step="0.1" value="1.0" />
+        <span id="speed-val">1.0×</span>
+        <span class="label">Loops</span>
+        <input type="number" id="loops" value="1" min="1" style="width:4em" />
+      </div>
+      <div class="row">
+        <button class="btn primary" data-act="recipe-run">Run Full</button>
+        <button class="btn" data-act="recipe-step">Next Phase</button>
+        <button class="btn danger" data-act="recipe-stop">Stop</button>
+      </div>
+      <div class="recipe-body">
+        <div>
+          <h3>Phases</h3>
+          <ol id="recipe-phases"></ol>
+        </div>
+        <div>
+          <h3>Key Positions</h3>
+          <ul id="recipe-positions"></ul>
+        </div>
+      </div>
+      <h3>Log</h3>
+      <pre id="recipe-log"></pre>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

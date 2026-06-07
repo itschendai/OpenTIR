@@ -1,0 +1,21 @@
+# ChArUco board -- source of truth for both authoring and CV machines.
+# The PDF in boards_pdfs/ is a derived artifact; this YAML is authoritative.
+# Identity is carried by `ids_start`: each physical board uses a disjoint
+# slice of the dictionary, so the detector tells them apart by marker ID
+# alone (no spatial-prior guesswork required).
+name: tag_01
+
+squares_x: 5            # short axis
+squares_y: 7            # long axis (odd x even breaks 180 deg symmetry)
+square_length_m: 0.01440  # MEASURED 2026-05-27 (caliper). Printer scaled the
+                          # print ~0.96x: designed 15 mm -> measured 14.4 mm/sq.
+                          # Same value verified on all 5 sheets in this batch.
+                          # Re-measure & update if this physical board is reprinted.
+marker_length_m: 0.01056  # 0.01440 * (11/15); the print scale is uniform so the
+                          # marker scaled in lockstep with the square.
+dictionary: DICT_5X5_100
+legacy_pattern: false   # explicit on both ends (4.6 vs 4.7 convention)
+ids_start: 0            # this board uses ArUco IDs 0..16 (17 markers)
+
+# Mounted on a 120 x 120 mm aluminum panel; printed pattern is 72.0 x 100.8 mm,
+# centered -> ~24.0 mm side margins, ~9.6 mm top/bottom margins.

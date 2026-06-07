@@ -1,0 +1,6 @@
+# GUI-only dependency. Install into the existing project venv:
+#   /home/src0/flexiv_rdk/.venv/bin/python -m pip install -r GUI/requirements.txt
+#
+# Everything else (flexivrdk, pyrealsense2, opencv-python, pyserial, numpy) is
+# already installed in that venv and used by project/helper/* and project/camera/*.
+flask>=3.0

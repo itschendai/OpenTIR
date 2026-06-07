@@ -1,0 +1,261 @@
+schema_version: 1
+calibrated_at: '2026-05-28T06:33:16.580+00:00'
+calibration_type: eye_in_hand
+method: tsai
+frame_convention:
+  camera: 'OpenCV/RealSense color optical: +x right, +y down, +z forward'
+  tcp_pose_world: Flexiv tcp_pose [x, y, z, qw, qx, qy, qz]
+  transform_matrix: T_a_b maps coordinates from frame b into frame a
+board:
+  name: tag_01
+  path: project/calibration/tag_01.yaml
+  squares_x: 5
+  squares_y: 7
+  square_length_m: 0.0144
+  marker_length_m: 0.01056
+  dictionary: DICT_5X5_100
+  legacy_pattern: false
+  ids_start: 0
+camera:
+  name: Intel RealSense D405
+  serial: '323622271112'
+  firmware: 5.12.14.100
+  frame: realsense_color_optical
+  image_size:
+  - 640
+  - 480
+  intrinsics:
+    width: 640
+    height: 480
+    fx: 393.2162170410156
+    fy: 392.8011779785156
+    ppx: 321.9538269042969
+    ppy: 242.68064880371094
+    model: distortion.inverse_brown_conrady
+    coeffs: &id001
+    - -0.049863170832395554
+    - 0.06075703352689743
+    - -0.00017576353275217116
+    - 0.0007152759935706854
+    - -0.02085849829018116
+    camera_matrix:
+    - - 393.2162170410156
+      - 0.0
+      - 321.9538269042969
+    - - 0.0
+      - 392.8011779785156
+      - 242.68064880371094
+    - - 0.0
+      - 0.0
+      - 1.0
+    dist_coeffs: *id001
+T_tcp_camera:
+- - 0.0008121275213679446
+  - 0.9401167859904638
+  - 0.34085153534618196
+  - -0.07785288998991002
+- - -0.999165487035435
+  - -0.013156544474537624
+  - 0.03866826676658261
+  - 0.0009860495795313493
+- - 0.04083711505641799
+  - -0.3405984938845884
+  - 0.9393215615524955
+  - -0.0976141231797765
+- - 0.0
+  - 0.0
+  - 0.0
+  - 1.0
+T_camera_tcp:
+- - 0.0008121275213679446
+  - -0.999165487035435
+  - 0.04083711505641799
+  - 0.005034732362376254
+- - 0.9401167859904638
+  - -0.013156544474537624
+  - -0.3405984938845884
+  - 0.03995655838563399
+- - 0.34085153534618196
+  - 0.03866826676658261
+  - 0.9393215615524955
+  - 0.11818919887081714
+- - 0.0
+  - 0.0
+  - 0.0
+  - 1.0
+transforms:
+  T_tcp_camera:
+    from_frame: tcp
+    to_frame: camera
+    convention: matrix maps homogeneous coordinates from to_frame into from_frame
+    matrix:
+    - - 0.0008121275213679446
+      - 0.9401167859904638
+      - 0.34085153534618196
+      - -0.07785288998991002
+    - - -0.999165487035435
+      - -0.013156544474537624
+      - 0.03866826676658261
+      - 0.0009860495795313493
+    - - 0.04083711505641799
+      - -0.3405984938845884
+      - 0.9393215615524955
+      - -0.0976141231797765
+    - - 0.0
+      - 0.0
+      - 0.0
+      - 1.0
+    translation_m:
+    - -0.07785288998991002
+    - 0.0009860495795313493
+    - -0.0976141231797765
+    quaternion_wxyz:
+    - 0.6940780115735057
+    - -0.13660811692887245
+    - 0.10806221177127409
+    - -0.6985101965085523
+  T_camera_tcp:
+    from_frame: camera
+    to_frame: tcp
+    convention: matrix maps homogeneous coordinates from to_frame into from_frame
+    matrix:
+    - - 0.0008121275213679446
+      - -0.999165487035435
+      - 0.04083711505641799
+      - 0.005034732362376254
+    - - 0.9401167859904638
+      - -0.013156544474537624
+      - -0.3405984938845884
+      - 0.03995655838563399
+    - - 0.34085153534618196
+      - 0.03866826676658261
+      - 0.9393215615524955
+      - 0.11818919887081714
+    - - 0.0
+      - 0.0
+      - 0.0
+      - 1.0
+    translation_m:
+    - 0.005034732362376254
+    - 0.03995655838563399
+    - 0.11818919887081714
+    quaternion_wxyz:
+    - 0.6940780115735057
+    - 0.13660811692887245
+    - -0.10806221177127409
+    - 0.6985101965085523
+quality:
+  sample_count: 10
+  mean_board_translation_world_m:
+  - 0.40866140147638913
+  - -0.22600810623215808
+  - 0.0862710049174995
+  translation_spread_mm:
+    mean: 0.6968155551209174
+    std: 0.36244313153522856
+    max: 1.51582983889977
+    per_sample:
+    - 0.380314061284403
+    - 0.6709660790678694
+    - 0.6538362878890497
+    - 0.7757345878129662
+    - 0.7452069497998018
+    - 0.3984341753312085
+    - 0.2293449821492648
+    - 1.51582983889977
+    - 0.48060357830695527
+    - 1.1178850106678848
+  rotation_spread_deg:
+    mean: 0.28634644896894307
+    std: 0.13322354084453694
+    max: 0.5000876979186686
+    per_sample:
+    - 0.07062209757117459
+    - 0.22379109536495972
+    - 0.4491557741185232
+    - 0.5000876979186686
+    - 0.2278948156838623
+    - 0.4682674841182196
+    - 0.21671310819290984
+    - 0.18199801805939836
+    - 0.28942143528602127
+    - 0.23551296337569275
+  reprojection_error_px:
+    mean: 0.14935835325899433
+    std: 0.03691785611208597
+    max: 0.22408093264794457
+    per_sample:
+    - 0.15758414418319155
+    - 0.19880879690300987
+    - 0.09954518590074257
+    - 0.22408093264794457
+    - 0.15275252910056164
+    - 0.12577486457766726
+    - 0.13672888677196238
+    - 0.14333317498613604
+    - 0.1532875109896204
+    - 0.10168750652910694
+axis_check:
+  camera_optical_z_in_tcp:
+  - 0.340851535346182
+  - 0.03866826676658262
+  - 0.9393215615524957
+  expected_axis_tcp:
+  - 0.0
+  - 0.0
+  - 1.0
+  angle_deg: 20.062068100677646
+  max_angle_deg: 45.0
+  within_threshold: true
+accepted_samples:
+- sample: project/calibration/samples/20260527T232847_390506
+  image: project/calibration/samples/20260527T232847_390506/color.png
+  marker_count: 17
+  charuco_count: 24
+  reprojection_error_px: 0.15758414418319155
+- sample: project/calibration/samples/20260527T232907_361005
+  image: project/calibration/samples/20260527T232907_361005/color.png
+  marker_count: 17
+  charuco_count: 24
+  reprojection_error_px: 0.19880879690300987
+- sample: project/calibration/samples/20260527T232916_130361
+  image: project/calibration/samples/20260527T232916_130361/color.png
+  marker_count: 17
+  charuco_count: 24
+  reprojection_error_px: 0.09954518590074257
+- sample: project/calibration/samples/20260527T232929_466307
+  image: project/calibration/samples/20260527T232929_466307/color.png
+  marker_count: 16
+  charuco_count: 20
+  reprojection_error_px: 0.22408093264794457
+- sample: project/calibration/samples/20260527T232941_202833
+  image: project/calibration/samples/20260527T232941_202833/color.png
+  marker_count: 16
+  charuco_count: 20
+  reprojection_error_px: 0.15275252910056164
+- sample: project/calibration/samples/20260527T233000_809020
+  image: project/calibration/samples/20260527T233000_809020/color.png
+  marker_count: 17
+  charuco_count: 24
+  reprojection_error_px: 0.12577486457766726
+- sample: project/calibration/samples/20260527T233009_245780
+  image: project/calibration/samples/20260527T233009_245780/color.png
+  marker_count: 16
+  charuco_count: 22
+  reprojection_error_px: 0.13672888677196238
+- sample: project/calibration/samples/20260527T233026_415362
+  image: project/calibration/samples/20260527T233026_415362/color.png
+  marker_count: 16
+  charuco_count: 22
+  reprojection_error_px: 0.14333317498613604
+- sample: project/calibration/samples/20260527T233041_717527
+  image: project/calibration/samples/20260527T233041_717527/color.png
+  marker_count: 17
+  charuco_count: 24
+  reprojection_error_px: 0.1532875109896204
+- sample: project/calibration/samples/20260527T233101_890667
+  image: project/calibration/samples/20260527T233101_890667/color.png
+  marker_count: 12
+  charuco_count: 14
+  reprojection_error_px: 0.10168750652910694
+rejected_samples: []

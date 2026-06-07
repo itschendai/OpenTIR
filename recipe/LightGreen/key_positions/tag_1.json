@@ -1,0 +1,59 @@
+{
+  "name": "vise-cali",
+  "timestamp": "2026-06-01T14:04:50.686-07:00",
+  "robot_sn": "Rizon4-062930",
+  "joint_group": null,
+  "floating_enabled": false,
+  "floating_mode": null,
+  "floating_joints": [],
+  "floating_axes": [],
+  "tcp_pose_world": {
+    "unit": "m, quaternion",
+    "order": [
+      "x",
+      "y",
+      "z",
+      "qw",
+      "qx",
+      "qy",
+      "qz"
+    ],
+    "values": [
+      0.4908164441585541,
+      -0.35888585448265076,
+      0.2316989153623581,
+      0.333814799785614,
+      -2.8787608243874274e-06,
+      0.9426386952400208,
+      -4.2088663576578256e-06
+    ]
+  },
+  "joint_angles_rad": [
+    -0.48324841260910034,
+    -0.3770833909511566,
+    -0.023466289043426514,
+    1.9395055770874023,
+    1.0325593948364258,
+    1.1869090795516968,
+    -1.40035879611969
+  ],
+  "joint_angles_deg": [
+    -27.688094498898046,
+    -21.60528682598289,
+    -1.344519323022425,
+    111.12548390919329,
+    59.161295420709564,
+    68.00488092406951,
+    -80.23464882167916
+  ],
+  "gripper_status": {
+    "name": "Flexiv-GN01",
+    "last_command": "initialized",
+    "width_m": 0.06004999950528145,
+    "force_n": 0.5,
+    "is_moving": false
+  },
+  "record_type": "key_position",
+  "key_position_name": "vise-cali",
+  "source_trajectory_name": "trajectory_waypoints"
+}

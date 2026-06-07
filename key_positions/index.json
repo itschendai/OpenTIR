@@ -1,0 +1,173 @@
+{
+  "updated_at": "2026-06-07T13:04:01.298-07:00",
+  "positions": {
+    "Vise": {
+      "file": "Vise.json",
+      "timestamp": "2026-06-07T13:01:34.973-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "cali-tag1"
+    },
+    "Inter": {
+      "file": "Inter.json",
+      "timestamp": "2026-05-22T16:33:45.261-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "trajectory_waypoints"
+    },
+    "Tray": {
+      "file": "Tray.json",
+      "timestamp": "2026-05-22T12:36:06.890-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "trajectory_waypoints"
+    },
+    "plastic": {
+      "file": "plastic.json",
+      "timestamp": "2026-05-21T19:22:16.851-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "trajectory_waypoints"
+    },
+    "glass": {
+      "file": "glass.json",
+      "timestamp": "2026-05-21T19:22:51.475-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "trajectory_waypoints"
+    },
+    "spring": {
+      "file": "spring.json",
+      "timestamp": "2026-05-21T19:27:19.568-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "trajectory_waypoints"
+    },
+    "Machine Access": {
+      "file": "Machine_Access.json",
+      "timestamp": "2026-05-22T15:59:12.823-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "trajectory_waypoints"
+    },
+    "Home": {
+      "file": "Home.json",
+      "timestamp": "2026-05-22T16:31:54.578-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "trajectory_waypoints"
+    },
+    "Plastic": {
+      "file": "Plastic.json",
+      "timestamp": "2026-06-07T13:03:52.158-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "cali-tag3"
+    },
+    "Spring": {
+      "file": "Spring.json",
+      "timestamp": "2026-06-07T13:03:52.157-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "cali-tag3"
+    },
+    "Glass": {
+      "file": "Glass.json",
+      "timestamp": "2026-06-07T13:03:52.159-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "cali-tag3"
+    },
+    "Peg": {
+      "file": "Peg.json",
+      "timestamp": "2026-05-22T20:07:19.342-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "trajectory_waypoints"
+    },
+    "Plate": {
+      "file": "Plate.json",
+      "timestamp": "2026-06-07T12:48:51.352-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "cali-tag2"
+    },
+    "Vise-Cali": {
+      "file": "Vise-Cali.json",
+      "timestamp": "2026-05-29T15:57:32.672-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "trajectory_waypoints"
+    },
+    "vise-cali": {
+      "file": "vise-cali.json",
+      "timestamp": "2026-06-01T14:04:50.686-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "trajectory_waypoints"
+    },
+    "Middle": {
+      "file": "Middle.json",
+      "timestamp": "2026-06-01T13:51:01.596-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "trajectory_waypoints"
+    },
+    "Vise_accurate": {
+      "file": "Vise_accurate.json",
+      "timestamp": "2026-06-04T01:21:39.806-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "trajectory_waypoints"
+    },
+    "tag_2": {
+      "file": "tag_2.json",
+      "timestamp": "2026-06-04T00:32:40.779-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "trajectory_waypoints"
+    },
+    "tag_3": {
+      "file": "tag_3.json",
+      "timestamp": "2026-06-07T13:04:01.297-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "trajectory_waypoints"
+    },
+    "Plate_accurate": {
+      "file": "Plate_accurate.json",
+      "timestamp": "2026-06-01T21:10:17.066-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "trajectory_waypoints"
+    },
+    "Spring_accurate": {
+      "file": "Spring_accurate.json",
+      "timestamp": "2026-06-04T00:46:12.904-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "trajectory_waypoints"
+    },
+    "Plastic_accurate": {
+      "file": "Plastic_accurate.json",
+      "timestamp": "2026-06-04T00:47:29.262-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "trajectory_waypoints"
+    },
+    "Glass_accurate": {
+      "file": "Glass_accurate.json",
+      "timestamp": "2026-06-04T00:43:24.060-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "trajectory_waypoints"
+    },
+    "tag_1": {
+      "file": "tag_1.json",
+      "timestamp": "2026-06-07T13:01:40.573-07:00",
+      "robot_sn": "Rizon4-062930",
+      "joint_group": null,
+      "source_trajectory_name": "trajectory_waypoints"
+    }
+  }
+}

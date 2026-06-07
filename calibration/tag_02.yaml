@@ -1,0 +1,12 @@
+# Identical geometry to tag_01; uniqueness is carried by ids_start.
+# See tag_01.yaml for full commentary.
+name: tag_02
+squares_x: 5
+squares_y: 7
+square_length_m: 0.01440  # MEASURED 2026-05-27 (caliper). Same 0.96x scale as
+                          # tag_01; verified across all 5 sheets in this print
+                          # batch. Re-measure if this board is reprinted.
+marker_length_m: 0.01056  # 0.01440 * (11/15); print scale is uniform.
+dictionary: DICT_5X5_100
+legacy_pattern: false
+ids_start: 17            # ArUco IDs 17..33

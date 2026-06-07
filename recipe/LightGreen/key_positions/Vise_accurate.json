@@ -1,0 +1,59 @@
+{
+  "name": "Vise_accurate",
+  "timestamp": "2026-06-01T19:25:13.894-07:00",
+  "robot_sn": "Rizon4-062930",
+  "joint_group": null,
+  "floating_enabled": false,
+  "floating_mode": null,
+  "floating_joints": [],
+  "floating_axes": [],
+  "tcp_pose_world": {
+    "unit": "m, quaternion",
+    "order": [
+      "x",
+      "y",
+      "z",
+      "qw",
+      "qx",
+      "qy",
+      "qz"
+    ],
+    "values": [
+      0.5993558764457703,
+      -0.5825733542442322,
+      0.37386175990104675,
+      0.7071000337600708,
+      -4.417955551616615e-06,
+      0.70711350440979,
+      -1.8302557691640686e-06
+    ]
+  },
+  "joint_angles_rad": [
+    -1.1807610988616943,
+    -0.8092005252838135,
+    0.3857322633266449,
+    1.1760040521621704,
+    1.613905906677246,
+    0.6969947218894958,
+    -2.065840721130371
+  ],
+  "joint_angles_deg": [
+    -67.65262757800444,
+    -46.36377487853177,
+    22.100830710645656,
+    67.38006887917508,
+    92.4699969838407,
+    39.934855907162685,
+    -118.36395446703273
+  ],
+  "gripper_status": {
+    "name": "Flexiv-GN01",
+    "last_command": "initialized",
+    "width_m": 0.013240000233054161,
+    "force_n": 50.2599983215332,
+    "is_moving": false
+  },
+  "record_type": "key_position",
+  "key_position_name": "Vise_accurate",
+  "source_trajectory_name": "trajectory_waypoints"
+}

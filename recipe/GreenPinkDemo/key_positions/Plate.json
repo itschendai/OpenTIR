@@ -1,0 +1,158 @@
+{
+  "name": "Plate",
+  "timestamp": "2026-06-07T13:14:09.038-07:00",
+  "robot_sn": "Rizon4-062930",
+  "joint_group": null,
+  "floating_enabled": false,
+  "floating_mode": null,
+  "floating_joints": [],
+  "floating_axes": [],
+  "tcp_pose_world": {
+    "unit": "m, quaternion",
+    "order": [
+      "x",
+      "y",
+      "z",
+      "qw",
+      "qx",
+      "qy",
+      "qz"
+    ],
+    "values": [
+      0.7798552628914088,
+      -0.01646546779067458,
+      0.06384860451276064,
+      0.0021390731465875585,
+      0.007662897589947178,
+      0.9998834978521993,
+      -0.013026706776869297
+    ]
+  },
+  "joint_angles_rad": [
+    -0.17334339022636414,
+    -1.1575363874435425,
+    0.47291645407676697,
+    1.1835229396820068,
+    -0.5479468107223511,
+    0.6296170353889465,
+    0.41546016931533813
+  ],
+  "joint_angles_deg": [
+    -9.931844666459948,
+    -66.32194963333504,
+    27.096116880891163,
+    67.8108694006953,
+    -31.39503965204448,
+    36.07439883732563,
+    23.804114257559466
+  ],
+  "gripper_status": {
+    "name": "Flexiv-GN01",
+    "last_command": "initialized",
+    "width_m": 0.0,
+    "force_n": 26.6200008392334,
+    "is_moving": false
+  },
+  "record_type": "key_position",
+  "key_position_name": "Plate",
+  "source_trajectory_name": "cali-tag2",
+  "relocalized_from_tag": {
+    "timestamp": "2026-06-07T13:14:09.038-07:00",
+    "tag_id": 2,
+    "board_name": "tag_02",
+    "board_yaml": "/home/src0/flexiv_rdk/project/calibration/tag_02.yaml",
+    "calibration_yaml": "/home/src0/flexiv_rdk/project/calibration/camera_tcp.yaml",
+    "reference_json": "/home/src0/flexiv_rdk/project/calibration/tag_02_to_plate_tcp.json",
+    "capture_image": "/home/src0/flexiv_rdk/calibration/captures/cali_tag2_raw.png",
+    "annotated_image": "/home/src0/flexiv_rdk/calibration/captures/cali_tag2_axes.png",
+    "camera_name": "Intel RealSense D405",
+    "camera_serial": "323622271112",
+    "charuco_count": 20,
+    "marker_count": 16,
+    "reprojection_error_px": 0.12977460333010457,
+    "board_pose_world": {
+      "matrix": [
+        [
+          0.9992034542848113,
+          0.038350260950222335,
+          -0.011032426313015903,
+          0.4661919981219284
+        ],
+        [
+          0.0384197645982263,
+          -0.9992427107676004,
+          0.006158462960399584,
+          0.03280743588993557
+        ],
+        [
+          -0.010787892913778163,
+          -0.006577420685009694,
+          -0.9999201762658928,
+          -0.19957721528541328
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "translation_m": [
+        0.4661919981219284,
+        0.03280743588993557,
+        -0.19957721528541328
+      ],
+      "quaternion_wxyz": [
+        -0.0031846213007957437,
+        0.9997957718102113,
+        0.01919642683861582,
+        -0.005456194115345829
+      ]
+    },
+    "keypos_pose_world": {
+      "matrix": [
+        [
+          -0.9998734087331994,
+          0.01537973984914885,
+          0.00407800324001241,
+          0.7798552628914088
+        ],
+        [
+          0.015268279534529432,
+          0.9995431698221506,
+          -0.026083161272021434,
+          -0.01646546779067458
+        ],
+        [
+          -0.004477292519874301,
+          -0.026017595278182638,
+          -0.9996514585532458,
+          0.06384860451276064
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "translation_m": [
+        0.7798552628914088,
+        -0.01646546779067458,
+        0.06384860451276064
+      ],
+      "quaternion_wxyz": [
+        0.0021390731465875585,
+        0.007662897589947178,
+        0.9998834978521993,
+        -0.013026706776869297
+      ]
+    },
+    "delta_from_previous_mm": [
+      0.24742334351279816,
+      3.7541499902242306,
+      -0.47366406823978746
+    ],
+    "delta_from_previous_rot_deg": 0.24884852374863103
+  }
+}
