@@ -15,6 +15,25 @@ import config
 from helper.arduino_client import ArduinoClient
 
 
+class _InfoOnlyLogger:
+    """Forward info/warn to the base logger but expose no ``debug``.
+
+    ArduinoClient only emits the per-command wire trace (``-> GET_STATUS`` /
+    ``<- DONE ...``) via ``debug``, and gates it on ``hasattr(logger, 'debug')``.
+    Omitting ``debug`` here silences that 1 Hz status spam while keeping the
+    useful connect / fault messages.
+    """
+
+    def __init__(self, base) -> None:
+        self._base = base
+
+    def info(self, msg: str) -> None:
+        self._base.info(msg)
+
+    def warn(self, msg: str) -> None:
+        self._base.warn(msg)
+
+
 class MachineController:
     def __init__(self, logger, executor) -> None:
         self._logger = logger
@@ -32,7 +51,7 @@ class MachineController:
         self._client = ArduinoClient(
             port=config.ARDUINO_PORT,
             baud=config.ARDUINO_BAUD,
-            logger=self._logger,
+            logger=_InfoOnlyLogger(self._logger),
             ready_timeout_s=config.ARDUINO_READY_TIMEOUT_S,
         )
         self._client.connect()

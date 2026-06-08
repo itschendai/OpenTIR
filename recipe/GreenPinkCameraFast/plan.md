@@ -16,79 +16,79 @@ This section is human-owned. Edit it freely when the desired behavior changes.
 The implementation sections below should be updated to match it.
 
 Speed legend (values come from `PARAMS` in `recipe.py`):
-- `MovePTP @ 30% joint-vel scale` — point-to-point moves to key positions are
+- `MovePTP @ 80% joint-vel scale` — point-to-point moves to key positions are
   commanded in joint space as a percentage of each joint's max speed
-  (`MOVE_JNT_VEL_SCALE = 30`), so they have **no single fixed m/s or deg/s**.
+  (`MOVE_JNT_VEL_SCALE = 80`), so they have **no single fixed m/s or deg/s**.
 - Linear (`MoveL`) and gripper moves have a real m/s value.
 - The only rotations are the twist (joint-space PTP) and the dump arc (`MoveC`,
   commanded as a TCP linear speed, not deg/s); see notes on those steps.
 - **Frame 5 fast mode** (steps 18-48, `FRAME5_FAST_ENABLED = True`): scrap
   removal runs faster than the delicate frames 1-4. There, MovePTP uses
-  `FRAME5_MOVE_JNT_VEL_SCALE = 70` (70%) and the lift/descent MoveL moves use
+  `FRAME5_MOVE_JNT_VEL_SCALE = 80` (80%) and the lift/descent MoveL moves use
   `FRAME5_CARTESIAN_VEL_M_S = 0.5` m/s. Set `FRAME5_FAST_ENABLED = False` to make
   frame 5 fall back to the frames 1-4 speeds.
 
 //frame 1
 1. Robot opens gripper. — gripper 0.05 m/s (`GRIPPER_VELOCITY_M_S`)
-2. Robot moves to Middle point. — MovePTP @ 30% joint-vel scale (no fixed m/s)
-Calibration preflight between steps 2 and 3: robot moves to tag 1, then tag 2, then tag 3. If the calibration flag is on, it runs `cali tag N`, updates the saved key positions for Vise, Plate, Spring, Glass, and Plastic, then returns to Middle. — all moves MovePTP @ 30% joint-vel scale (no fixed m/s)
+2. Robot moves to Middle point. — MovePTP @ 80% joint-vel scale (no fixed m/s)
+Calibration preflight between steps 2 and 3: robot moves to tag 1, then tag 2, then tag 3. If the calibration flag is on, it runs `cali tag N`, updates the saved key positions for Vise, Plate, Spring, Glass, and Plastic, then returns to Middle. — all moves MovePTP @ 80% joint-vel scale (no fixed m/s)
 
 //frame 2
-3. Robot moves to Plate point. — MovePTP @ 30% joint-vel scale (no fixed m/s)
+3. Robot moves to Plate point. — MovePTP @ 80% joint-vel scale (no fixed m/s)
 4. Robot runs Align Injectable. — MoveL 0.02 m/s (`INJECTABLE_ALIGN_LINEAR_VEL_M_S`)
 5. Robot runs Grasp. — pre-contact MoveL 0.15 m/s (`GRASP_PRECONTACT_MOVE_VEL_M_S`), contact MoveL 0.05 m/s (`GRASP_CONTACT_VEL_M_S`), gripper 0.05 m/s (`GRIPPER_VELOCITY_M_S`)
 6. Robot moves straight up World Z +20 cm. — MoveL 0.06 m/s (`CARTESIAN_RETREAT_VEL_M_S`)
-7. Robot moves to Middle point. — MovePTP @ 30% joint-vel scale (no fixed m/s)
+7. Robot moves to Middle point. — MovePTP @ 80% joint-vel scale (no fixed m/s)
 
 //frame 3
-8. Robot moves to above Vise position. — MovePTP @ 30% joint-vel scale (no fixed m/s)
+8. Robot moves to above Vise position. — MovePTP @ 80% joint-vel scale (no fixed m/s)
 9. Robot runs Flexiv `InsertComp` primitive down in world Z to insert injectable into vise. — 0.02 m/s insert (`INSERTCOMP_INSERT_VEL_M_S`)
 10. Machine closes vise to a 5 kg target force while the robot floats in the TCP Y-Z plane plus TCP RX rotation (`FloatingCartesian` in TCP START frame on axes `y,z,rx`). — Arduino/machine action + robot floating max 0.2 m/s (`VISE_CLOSE_FLOATING_MAX_VEL_M_S`, controller minimum)
 11. Robot exits the compliant insertion hold / TCP Y-Z-RX floating state, switches to joint hold / non-force control at the current pose, then opens gripper to 5 cm width to release the injectable. — gripper 0.05 m/s (`GRIPPER_VELOCITY_M_S`)
 12. While still in joint hold, robot opens gripper fully, waits for gripper to finish opening, then asks the machine to run `HOME_ALL` and `CLOSE_VISE` once more at the same 5 kg target force to confirm the injectable is left in a good clamped state; only after that does it switch back to motion primitive control and move straight up in world Z by 15 cm to avoid hitting the injectable and wait. — gripper 0.05 m/s; Arduino `HOME_ALL` + `CLOSE_VISE`; retreat MoveL 0.06 m/s (`CARTESIAN_RETREAT_VEL_M_S`)
 
 //frame 4
-13. Machine starts cut height primitive (`cut_height z_mm=133 x_mm=111 deg=360`) to remove top; once `CUT_HEIGHT` finishes in its safe final state, machine runs `CLOSE_VISE` one more time at the same 5 kg target force so the injectable is tight before the cap twist. — Arduino/machine action (no robot speed)
+13. Machine starts cut height primitive (`cut_height z_mm=134.2 x_mm=110.5 deg=360`) to remove top; once `CUT_HEIGHT` finishes in its safe final state, machine runs `CLOSE_VISE` one more time at the same 5 kg target force so the injectable is tight before the cap twist. — Arduino/machine action (no robot speed)
 14. Robot moves down to 2cm lower than Vise position and then 1cm further in the + tcp z axis. — MoveL 0.06 m/s (`CARTESIAN_INSERT_VEL_M_S`) so we have a firm grip location on the injectable
 15. Robot floats in the same TCP `y/z/rx` axes, then closes gripper to 80 N on the cap. — `FloatingCartesian` in TCP START frame on axes `y,z,rx`, then gripper 0.05 m/s (`GRIPPER_VELOCITY_M_S`)
-16. Robot exits the TCP `y/z/rx` floating state, then performs a twist: rotate around TCP X by 7 degrees, then return to 0. — rotation via MovePTP @ 30% joint-vel scale (no fixed deg/s)
+16. Robot exits the TCP `y/z/rx` floating state, then performs a twist: rotate around TCP X through `0 -> +7 -> -10` degrees to make sure the cap fully twists off. — rotation via MovePTP @ 20% joint-vel scale (`CAP_TWIST_MOVE_JNT_VEL_SCALE = 20`; no fixed deg/s)
 17. Robot slowly raises up in **positive world Z** by 20 cm to release cap. — MoveL 0.06 m/s (`CARTESIAN_RETREAT_VEL_M_S`)
 
-//frame 5 — fast mode (FRAME5_FAST_ENABLED): MovePTP @ 70%, lift/descent MoveL @ 0.5 m/s
-18. Robot moves to Middle point. — MovePTP @ 70% joint-vel scale (no fixed m/s)
-19. Robot moves to Plastic point. — MovePTP @ 70% joint-vel scale (no fixed m/s)
+//frame 5 — fast mode (FRAME5_FAST_ENABLED): MovePTP @ 80%, lift/descent MoveL @ 0.5 m/s
+18. Robot moves to Middle point. — MovePTP @ 80% joint-vel scale (no fixed m/s)
+19. Robot moves to Plastic point. — MovePTP @ 80% joint-vel scale (no fixed m/s)
 20. Robot opens gripper. — gripper 0.05 m/s (`GRIPPER_VELOCITY_M_S`)
 Remove spring:
-21. Robot moves to Middle point. — MovePTP @ 70% joint-vel scale (no fixed m/s)
-22. Robot moves to above vise position (Vise world Z +10 cm). — MovePTP @ 70% joint-vel scale (no fixed m/s)
+21. Robot moves to Middle point. — MovePTP @ 80% joint-vel scale (no fixed m/s)
+22. Robot moves to above vise position (Vise world Z +10 cm). — MovePTP @ 80% joint-vel scale (no fixed m/s)
 23. Robot moves down to Vise position. — MoveL 0.5 m/s (`FRAME5_CARTESIAN_VEL_M_S`)
 24. Robot closes gripper to 80 N. — gripper 0.05 m/s (`GRIPPER_VELOCITY_M_S`)
 25. Robot slowly raises up in **positive world Z** by 15 cm to release cap. — MoveL 0.5 m/s (`FRAME5_CARTESIAN_VEL_M_S`)
-26. Robot moves to Middle point. — MovePTP @ 70% joint-vel scale (no fixed m/s)
-27. Robot moves to Spring point. — MovePTP @ 70% joint-vel scale (no fixed m/s)
+26. Robot moves to Middle point. — MovePTP @ 80% joint-vel scale (no fixed m/s)
+27. Robot moves to Spring point. — MovePTP @ 80% joint-vel scale (no fixed m/s)
 28. Robot opens gripper. — gripper 0.05 m/s (`GRIPPER_VELOCITY_M_S`)
 Remove yellow plastic:
-29. Robot moves to Middle point. — MovePTP @ 70% joint-vel scale (no fixed m/s)
-30. Robot moves to above vise position (Vise world Z +10 cm). — MovePTP @ 70% joint-vel scale (no fixed m/s)
-31. Robot moves down to a bit below Vise position (Vise world Z -3.8 cm). — MoveL 0.5 m/s (`FRAME5_CARTESIAN_VEL_M_S`)
+29. Robot moves to Middle point. — MovePTP @ 80% joint-vel scale (no fixed m/s)
+30. Robot moves to above vise position (Vise world Z +10 cm). — MovePTP @ 80% joint-vel scale (no fixed m/s)
+31. Robot moves down to a bit below Vise position (Vise world Z -4 cm) plus anther +1cm in tcp +z. — MoveL 0.5 m/s (`FRAME5_CARTESIAN_VEL_M_S`)
 32. Robot closes gripper to 80 N. — gripper 0.05 m/s (`GRIPPER_VELOCITY_M_S`)
 33. Robot slowly raises up in **positive world Z** by 10 cm to release cap. — MoveL 0.5 m/s (`FRAME5_CARTESIAN_VEL_M_S`)
-34. Robot moves to Middle point. — MovePTP @ 70% joint-vel scale (no fixed m/s)
-35. Robot moves to Plastic point. — MovePTP @ 70% joint-vel scale (no fixed m/s)
+34. Robot moves to Middle point. — MovePTP @ 80% joint-vel scale (no fixed m/s)
+35. Robot moves to Plastic point. — MovePTP @ 80% joint-vel scale (no fixed m/s)
 36. Robot opens gripper. — gripper 0.05 m/s (`GRIPPER_VELOCITY_M_S`)
 Remove shell and glass:
-37. Robot moves to Middle point. — MovePTP @ 70% joint-vel scale (no fixed m/s)
-38. Robot moves to above vise position (Vise world Z +10 cm). — MovePTP @ 70% joint-vel scale (no fixed m/s)
-39. Robot moves down to a bit below Vise position (Vise world Z -6 cm). — MoveL 0.5 m/s (`FRAME5_CARTESIAN_VEL_M_S`)
+37. Robot moves to Middle point. — MovePTP @ 80% joint-vel scale (no fixed m/s)
+38. Robot moves to above vise position (Vise world Z +10 cm). — MovePTP @ 80% joint-vel scale (no fixed m/s)
+39. Robot moves down to a bit below Vise position (Vise world Z -6 cm) and +1cm in the tcp z axis. — MoveL 0.5 m/s (`FRAME5_CARTESIAN_VEL_M_S`)
 40. Robot closes gripper to 80 N. — gripper 0.05 m/s (`GRIPPER_VELOCITY_M_S`)
 41. Machine opens vise. — Arduino/machine action (no robot speed)
 42. Robot slowly raises up in **positive world Z** by 20 cm to release cap. — MoveL 0.5 m/s (`FRAME5_CARTESIAN_VEL_M_S`)
-43. Robot moves to Middle point. — MovePTP @ 70% joint-vel scale (no fixed m/s)
-44. Robot moves to Glass point. — MovePTP @ 70% joint-vel scale (no fixed m/s)
+43. Robot moves to Middle point. — MovePTP @ 80% joint-vel scale (no fixed m/s)
+44. Robot moves to Glass point. — MovePTP @ 80% joint-vel scale (no fixed m/s)
 45. The robot performs Dump with one continuous MoveC arc around an upper-left virtual point in the tool frame (Rz 176 and then turn back). — MoveC 0.03 m/s TCP linear (`DUMP_MOVEC_VEL_M_S`, unchanged); the pivot is ~28 mm from the TCP, so this works out to ~61 deg/s angular (derived, not commanded directly)
-46. Robot moves to Plastic point. — MovePTP @ 70% joint-vel scale (no fixed m/s)
+46. Robot moves to Plastic point. — MovePTP @ 80% joint-vel scale (no fixed m/s)
 47. Robot opens gripper. — gripper 0.05 m/s (`GRIPPER_VELOCITY_M_S`)
-48. Robot moves to Middle point. — MovePTP @ 70% joint-vel scale (no fixed m/s)
+48. Robot moves to Middle point. — MovePTP @ 80% joint-vel scale (no fixed m/s)
 
 ## Implementation Workspace
 
@@ -111,7 +111,7 @@ The current objective describes a first integrated teardown:
 7. Load it into the vise from `above_vise` using Flexiv `InsertComp`.
 8. Let the Arduino close the vise while the robot floats in TCP Y-Z plus TCP RX to accommodate clamp-side alignment and small insertion roll.
 9. Exit the compliant insertion hold / TCP Y-Z-RX floating state, park the arm in joint hold for the gripper-open actions, ask the machine to re-home and re-close the vise to confirm the injectable is stable, then switch back to motion primitive control and retreat to a safe waiting pose.
-10. Let the Arduino run `CUT_HEIGHT` with `z=133`, `x=111`, `deg=360` to
+10. Let the Arduino run `CUT_HEIGHT` with `z=134.2`, `x=110.5`, `deg=360` to
    remove the top.
 11. Return to relocalized `Vise`, grip the cap, twist around TCP X, lift it out in
    positive world Z, then leave the machine through `Inter` and `Home` before
@@ -219,7 +219,7 @@ Arduino cutting machine:
 | 11 | Hold part in gripper while floating in TCP `y,z,rx` | `CLOSE_VISE` | Robot keeps custody until vise confirms closed, with clamp-side compliance in the TCP Y-Z plane plus small TCP-X roll freedom. |
 | 12 | Switch to joint hold, then open gripper to 5 cm width | None | Only after `CLOSE_VISE DONE`; exits both `InsertComp` compliance and TCP Y-Z-RX floating before release. |
 | 13 | Open gripper fully in joint hold, then run `HOME_ALL` + `CLOSE_VISE`, switch back to primitive motion, retreat by world Z +15 cm, wait | `HOME_ALL`, `CLOSE_VISE` | Confirms the injectable is left well-seated in the vise before the robot clears out. |
-| 14 | Robot holds still | `CUT_HEIGHT z=133 x=111 deg=360`, then `CLOSE_VISE` | Robot must be clear; after the cut finishes safely, re-tighten the vise before the cap re-grip/twist. |
+| 14 | Robot holds still | `CUT_HEIGHT z=134.2 x=110.5 deg=360`, then `CLOSE_VISE` | Robot must be clear; after the cut finishes safely, re-tighten the vise before the cap re-grip/twist. |
 | 15 | Move down in world Z to `Vise` | None | Only after cut final state is safe. |
 | 16 | Float in TCP `y,z,rx`, then close gripper at 80 N | None | Uses the same clamp-side floating axes as vise close so the cap grip can settle before twisting/lifting. |
 | 17 | Exit TCP `y,z,rx` floating, then twist around TCP X | None | Returns to rigid motion before the commanded twist. |
@@ -271,7 +271,7 @@ Use phase functions that map directly to the human objective:
 
 6. `phase_cut()`
    - verify robot clear
-   - `CUT_HEIGHT x=111 z=133 deg=360`
+   - `CUT_HEIGHT x=110.5 z=134.2 deg=360`
    - verify blade off, X/Z returned home, and rotary is within tolerance
 
 7. `phase_twist_and_drop_cap()`
@@ -364,7 +364,7 @@ PARAMS = {
     "ROBOT_SN": "Rizon4-062930",
     "GRIPPER_NAME": "Flexiv-GN01",
     "KEY_POSITION_DIR": "key_positions",
-    "MOVE_JNT_VEL_SCALE": 30,
+    "MOVE_JNT_VEL_SCALE": 80,
     "MOVE_USE_REF_JOINTS": False,
     "CARTESIAN_INSERT_VEL_M_S": 0.06,
     "CARTESIAN_RETREAT_VEL_M_S": 0.06,
@@ -386,12 +386,14 @@ PARAMS = {
     "INSERTCOMP_INSERT_VEL_M_S": 0.01,
     "INSERTCOMP_COMP_VEL_SCALE": 20.0,
     "INSERTCOMP_TIMEOUT_S": 20.0,
-    "CUT_X_MM": 111.0,
-    "CUT_Z_MM": 133.0,
+    "CUT_X_MM": 110.5,
+    "CUT_Z_MM": 134.2,
     "CUT_DEG": 360.0,
     "ROT_SAFE_TOL_DEG": 0.2,
     "CAP_GRIP_Z_OFFSET_M": 0.0,
     "CAP_TWIST_DEG": 7.0,
+    "CAP_TWIST_NEG_DEG": -10.0,
+    "CAP_TWIST_MOVE_JNT_VEL_SCALE": 20,
     "CAP_TWIST_REPEAT_COUNT": 1,
     "CAP_LIFT_Z_OFFSET_M": 0.20,
 }

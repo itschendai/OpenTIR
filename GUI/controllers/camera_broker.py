@@ -27,6 +27,7 @@ class CameraBroker:
         self._detector = importlib.import_module("camera.detect_injectable_static")
         self._session: SharedInjectableCameraSession | None = None
         self._encode_params = [cv2.IMWRITE_JPEG_QUALITY, config.CAMERA_JPEG_QUALITY]
+        self._last_jpeg: bytes | None = None
 
     def start(self) -> None:
         self._session = SharedInjectableCameraSession(
@@ -49,13 +50,30 @@ class CameraBroker:
         """Hook for future injectable/tag overlays. Raw passthrough for now."""
         return color_bgr
 
-    def get_jpeg(self) -> bytes | None:
-        color, _depth, _intr, _scale = self._session.get_latest_aligned_rgbd(timeout_s=5.0)
-        frame = self.overlay(color)
-        ok, buf = cv2.imencode(".jpg", frame, self._encode_params)
-        if not ok:
+    def _latest_color(self):
+        """Read the latest cached colour frame WITHOUT resuming the pipeline.
+
+        ``get_latest_aligned_rgbd`` auto-resumes a paused session; that would let
+        the live-view stream steal the (USB-2) camera back from a recipe that has
+        temporarily released it for an external capture (e.g. tag calibration).
+        We deliberately stay passive: read the cached frame, and if the session is
+        paused or has none yet, the caller keeps serving the last good JPEG.
+        """
+        sess = self._session
+        if sess is None:
             return None
-        return buf.tobytes()
+        with sess._lock:
+            frame = sess._latest_frame
+        return None if frame is None else frame["color_image"]
+
+    def get_jpeg(self) -> bytes | None:
+        color = self._latest_color()
+        if color is None:
+            return self._last_jpeg
+        ok, buf = cv2.imencode(".jpg", self.overlay(color), self._encode_params)
+        if ok:
+            self._last_jpeg = buf.tobytes()
+        return self._last_jpeg
 
     def mjpeg_frames(self):
         boundary = b"--frame\r\n"

@@ -58,7 +58,7 @@ PARAMS: dict[str, Any] = {
     "GRIPPER_NAME": "Flexiv-GN01",
     "KEY_POSITION_DIR": "key_positions",
     "SLOW_MODE_ENABLED": False,
-    "MOVE_JNT_VEL_SCALE": 30,
+    "MOVE_JNT_VEL_SCALE": 80,
     "MOVE_USE_REF_JOINTS": False,
     "MOVE_ZONE_RADIUS": "ZFine",
     "MOVE_TARGET_TOLER_LEVEL": 1,
@@ -70,7 +70,7 @@ PARAMS: dict[str, Any] = {
     # run faster than the delicate pickup/insert/cut frames. Set
     # FRAME5_FAST_ENABLED False to make frame 5 use the same speeds as 1-4.
     "FRAME5_FAST_ENABLED": True,
-    "FRAME5_MOVE_JNT_VEL_SCALE": 70,
+    "FRAME5_MOVE_JNT_VEL_SCALE": 80,
     "FRAME5_CARTESIAN_VEL_M_S": 0.5,
     "GRIPPER_OPEN_WIDTH_M": 0.06,
     "GRIPPER_RELEASE_WIDTH_M": 0.05,
@@ -140,11 +140,13 @@ PARAMS: dict[str, Any] = {
     "SPRING_REMOVE_FORCE_N": 80.0,
     "SPRING_REMOVE_LIFT_Z_OFFSET_M": 0.15,
     "YELLOW_REMOVE_APPROACH_Z_OFFSET_M": 0.10,
-    "YELLOW_REMOVE_GRIP_Z_OFFSET_M": -0.038,
+    "YELLOW_REMOVE_GRIP_Z_OFFSET_M": -0.04,
+    "YELLOW_REMOVE_GRIP_TCP_Z_OFFSET_M": 0.01,
     "YELLOW_REMOVE_FORCE_N": 80.0,
     "YELLOW_REMOVE_LIFT_Z_OFFSET_M": 0.10,
     "SHELL_REMOVE_APPROACH_Z_OFFSET_M": 0.10,
     "SHELL_REMOVE_GRIP_Z_OFFSET_M": -0.06,
+    "SHELL_REMOVE_GRIP_TCP_Z_OFFSET_M": 0.01,
     "SHELL_REMOVE_FORCE_N": 80.0,
     "SHELL_REMOVE_LIFT_Z_OFFSET_M": 0.20,
     "DUMP_TOOL_Z_DEG": 176.0,
@@ -165,14 +167,16 @@ PARAMS: dict[str, Any] = {
     "INSERTCOMP_START_TIMEOUT_S": 3.0,
     "INSERTCOMP_TIMEOUT_S": 20.0,
     "VISE_TARGET_FORCE_KG": 5.0,
-    "CUT_X_MM": 111.0,
-    "CUT_Z_MM": 133.0,
+    "CUT_X_MM": 110.5,
+    "CUT_Z_MM": 134.2,
     "CUT_DEG": 360.0,
     "ROT_SAFE_TOL_DEG": 0.2,
     "CAP_GRIP_Z_OFFSET_M": None,
     "CAP_GRIP_WORLD_Z_OFFSET_M": -0.02,
     "CAP_GRIP_TCP_Z_OFFSET_M": 0.01,
     "CAP_TWIST_DEG": 7.0,
+    "CAP_TWIST_NEG_DEG": -10.0,
+    "CAP_TWIST_MOVE_JNT_VEL_SCALE": 20,
     "CAP_TWIST_REPEAT_COUNT": 1,
     "CAP_LIFT_Z_OFFSET_M": 0.20,
     "ARDUINO_PORT": None,
@@ -222,7 +226,7 @@ PLAN_STEPS = {
     13: "CUT_HEIGHT",
     14: "move to 2 cm below Vise, then +1 cm in TCP Z",
     15: "close gripper at 80 N on cap",
-    16: "twist cap around TCP X and return",
+    16: "twist cap around TCP X and stop at the final negative angle",
     17: "lift cap up in positive world Z",
     18: "move to Middle",
     19: "move to Plastic",
@@ -276,7 +280,11 @@ for cycle in REMOVAL_CYCLES:
         {
             int(steps["transit"]): f"move to Middle for {name} removal",
             int(steps["above_vise"]): f"move to above Vise for {name} removal",
-            int(steps["grip"]): f"move to Vise grasp for {name} removal",
+            int(steps["grip"]): (
+                f"move to Vise grasp for {name} removal"
+                if name != "Yellow plastic"
+                else "move to yellow-plastic grip: Vise world Z -4 cm, then +1 cm in TCP Z"
+            ),
             int(steps["close"]): f"close gripper for {name} removal",
             int(steps["lift"]): f"lift {name} up in positive world Z",
             int(steps["return_transit"]): f"move to Middle after {name} removal",
@@ -319,7 +327,7 @@ PLAN_STEPS.update(
     {
         37: "move to Middle for shell and glass removal",
         38: "move to above Vise for shell and glass removal",
-        39: "move to Vise grasp for shell and glass removal",
+        39: "move to shell/glass grip: Vise world Z -6 cm, then +1 cm in TCP Z",
         40: "close gripper for shell and glass removal",
         41: "open vise before lifting shell",
         42: "lift shell up in positive world Z",
@@ -1507,11 +1515,21 @@ class RecipeContext:
 
     def twist_cap(self) -> None:
         twist_deg = float(self.params["CAP_TWIST_DEG"])
+        twist_neg_deg = float(self.params["CAP_TWIST_NEG_DEG"])
+        twist_vel_scale = int(self.params["CAP_TWIST_MOVE_JNT_VEL_SCALE"])
         repeat_count = int(self.params["CAP_TWIST_REPEAT_COUNT"])
         self.logger.info(
-            f"Twist cap: TCP X {twist_deg:+.1f} deg then back to 0 repeat={repeat_count}"
+            "Twist cap: "
+            f"TCP X 0 -> {twist_deg:+.1f} -> {twist_neg_deg:+.1f} "
+            f"repeat={repeat_count} jntVelScale={twist_vel_scale}"
         )
         if self.dry_run:
+            for index in range(repeat_count):
+                self.logger.info(
+                    f"[dry-run] twist cycle {index + 1}: "
+                    f"0 -> {twist_deg:+.1f} -> {twist_neg_deg:+.1f} "
+                    f"@ jntVelScale={twist_vel_scale}"
+                )
             return
         if self.session is None:
             raise RecipeError("robot session is not available")
@@ -1532,9 +1550,9 @@ class RecipeContext:
             },
         }
         for index in range(repeat_count):
-            label = f"twist_{index + 1}"
-            twist_pose = {
-                "name": label,
+            positive_label = f"twist_{index + 1}_positive"
+            positive_pose = {
+                "name": positive_label,
                 "q_rad": start_q_rad,
                 "tcp_pose_world": {
                     "order": ["x", "y", "z", "qw", "qx", "qy", "qz"],
@@ -1544,8 +1562,30 @@ class RecipeContext:
                     ),
                 },
             }
-            self.move_ptp(label, twist_pose, use_ref_joints=True)
-            self.move_ptp(f"twist_{index + 1}_return", start_pose, use_ref_joints=True)
+            negative_label = f"twist_{index + 1}_negative"
+            negative_pose = {
+                "name": negative_label,
+                "q_rad": start_q_rad,
+                "tcp_pose_world": {
+                    "order": ["x", "y", "z", "qw", "qx", "qy", "qz"],
+                    "values": rotate_tcp_about_tool_axis(
+                        start_tcp,
+                        roll_deg=twist_neg_deg,
+                    ),
+                },
+            }
+            self.move_ptp(
+                positive_label,
+                positive_pose,
+                use_ref_joints=True,
+                vel_scale=twist_vel_scale,
+            )
+            self.move_ptp(
+                negative_label,
+                negative_pose,
+                use_ref_joints=True,
+                vel_scale=twist_vel_scale,
+            )
 
     def dump_tool_z(self) -> None:
         dump_deg = float(self.params["DUMP_TOOL_Z_DEG"])
@@ -1818,6 +1858,30 @@ def cap_grip_tcp_pose(ctx: RecipeContext, base_pose: dict) -> dict:
     )
 
 
+def yellow_remove_grip_world_pose(ctx: RecipeContext) -> dict:
+    return vise_offset_pose(ctx, float(ctx.params["YELLOW_REMOVE_GRIP_Z_OFFSET_M"]))
+
+
+def yellow_remove_grip_tcp_pose(ctx: RecipeContext, base_pose: dict) -> dict:
+    return offset_pose_tcp_axis(
+        base_pose,
+        "z",
+        float(ctx.params["YELLOW_REMOVE_GRIP_TCP_Z_OFFSET_M"]),
+    )
+
+
+def shell_remove_grip_world_pose(ctx: RecipeContext) -> dict:
+    return vise_offset_pose(ctx, float(ctx.params["SHELL_REMOVE_GRIP_Z_OFFSET_M"]))
+
+
+def shell_remove_grip_tcp_pose(ctx: RecipeContext, base_pose: dict) -> dict:
+    return offset_pose_tcp_axis(
+        base_pose,
+        "z",
+        float(ctx.params["SHELL_REMOVE_GRIP_TCP_Z_OFFSET_M"]),
+    )
+
+
 def resolve_drop_pose(ctx: RecipeContext, target_name: str) -> tuple[str, dict, bool]:
     if target_name in ctx.poses:
         return target_name, ctx.poses[target_name], False
@@ -1973,11 +2037,24 @@ def execute_plan_step(
                 vel_scale=ptp_vel_scale,
             )
         elif action == "grip":
-            ctx.move_l(
-                f"{name}_grip",
-                vise_offset_pose(ctx, grip_z_m),
-                vel_m_s=insert_vel,
-            )
+            if name == "Yellow plastic":
+                yellow_world_pose = yellow_remove_grip_world_pose(ctx)
+                ctx.move_l(
+                    "Yellow plastic_grip_world_z",
+                    yellow_world_pose,
+                    vel_m_s=insert_vel,
+                )
+                ctx.move_l(
+                    "Yellow plastic_grip_tcp_z",
+                    yellow_remove_grip_tcp_pose(ctx, yellow_world_pose),
+                    vel_m_s=insert_vel,
+                )
+            else:
+                ctx.move_l(
+                    f"{name}_grip",
+                    vise_offset_pose(ctx, grip_z_m),
+                    vel_m_s=insert_vel,
+                )
         elif action == "close":
             ctx.gripper("close", force_n=force_n)
         elif action == "lift":
@@ -2006,11 +2083,15 @@ def execute_plan_step(
                 vel_scale=ptp_vel_scale,
             )
         elif shell_offset == 2:
+            shell_world_pose = shell_remove_grip_world_pose(ctx)
             ctx.move_l(
-                "shell_grip",
-                vise_offset_pose(
-                    ctx, float(ctx.params["SHELL_REMOVE_GRIP_Z_OFFSET_M"])
-                ),
+                "shell_grip_world_z",
+                shell_world_pose,
+                vel_m_s=insert_vel,
+            )
+            ctx.move_l(
+                "shell_grip_tcp_z",
+                shell_remove_grip_tcp_pose(ctx, shell_world_pose),
                 vel_m_s=insert_vel,
             )
         elif shell_offset == 3:
@@ -2569,10 +2650,12 @@ def print_dry_run_summary(
         "SPRING_REMOVE_LIFT_Z_OFFSET_M",
         "YELLOW_REMOVE_APPROACH_Z_OFFSET_M",
         "YELLOW_REMOVE_GRIP_Z_OFFSET_M",
+        "YELLOW_REMOVE_GRIP_TCP_Z_OFFSET_M",
         "YELLOW_REMOVE_FORCE_N",
         "YELLOW_REMOVE_LIFT_Z_OFFSET_M",
         "SHELL_REMOVE_APPROACH_Z_OFFSET_M",
         "SHELL_REMOVE_GRIP_Z_OFFSET_M",
+        "SHELL_REMOVE_GRIP_TCP_Z_OFFSET_M",
         "SHELL_REMOVE_FORCE_N",
         "SHELL_REMOVE_LIFT_Z_OFFSET_M",
         "DUMP_TOOL_Z_DEG",
@@ -2597,6 +2680,8 @@ def print_dry_run_summary(
         "CAP_GRIP_WORLD_Z_OFFSET_M",
         "CAP_GRIP_TCP_Z_OFFSET_M",
         "CAP_TWIST_DEG",
+        "CAP_TWIST_NEG_DEG",
+        "CAP_TWIST_MOVE_JNT_VEL_SCALE",
         "CAP_TWIST_REPEAT_COUNT",
         "CAP_LIFT_Z_OFFSET_M",
         "GRIPPER_FORCE_N",
@@ -2751,10 +2836,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--cut-z-mm", type=float, default=None)
     parser.add_argument("--cut-deg", type=float, default=None)
     parser.add_argument("--rot-safe-tol-deg", type=float, default=None)
+    parser.add_argument("--yellow-grip-tcp-z-m", type=float, default=None)
+    parser.add_argument("--shell-grip-tcp-z-m", type=float, default=None)
     parser.add_argument("--cap-grip-z-m", type=float, default=None)
     parser.add_argument("--cap-grip-world-z-m", type=float, default=None)
     parser.add_argument("--cap-grip-tcp-z-m", type=float, default=None)
     parser.add_argument("--cap-twist-deg", type=float, default=None)
+    parser.add_argument("--cap-twist-neg-deg", type=float, default=None)
+    parser.add_argument("--cap-twist-jnt-vel-scale", type=int, default=None)
     parser.add_argument("--cap-twist-repeat-count", type=int, default=None)
     parser.add_argument("--cap-lift-z-m", type=float, default=None)
     parser.add_argument("--gripper-force-n", type=float, default=None)
@@ -2842,9 +2931,11 @@ def resolve_params(args: argparse.Namespace) -> dict:
         "SPRING_REMOVE_FORCE_N": args.spring_force_n,
         "YELLOW_REMOVE_APPROACH_Z_OFFSET_M": args.yellow_approach_z_m,
         "YELLOW_REMOVE_GRIP_Z_OFFSET_M": args.yellow_grip_z_m,
+        "YELLOW_REMOVE_GRIP_TCP_Z_OFFSET_M": args.yellow_grip_tcp_z_m,
         "YELLOW_REMOVE_FORCE_N": args.yellow_force_n,
         "SHELL_REMOVE_APPROACH_Z_OFFSET_M": args.shell_approach_z_m,
         "SHELL_REMOVE_GRIP_Z_OFFSET_M": args.shell_grip_z_m,
+        "SHELL_REMOVE_GRIP_TCP_Z_OFFSET_M": args.shell_grip_tcp_z_m,
         "SHELL_REMOVE_FORCE_N": args.shell_force_n,
         "VISE_OPEN_TARGET_FORCE_KG": args.vise_open_target_force_kg,
         "INSERTCOMP_INSERT_AXIS": args.insertcomp_insert_axis,
@@ -2862,6 +2953,8 @@ def resolve_params(args: argparse.Namespace) -> dict:
         "CAP_GRIP_WORLD_Z_OFFSET_M": args.cap_grip_world_z_m,
         "CAP_GRIP_TCP_Z_OFFSET_M": args.cap_grip_tcp_z_m,
         "CAP_TWIST_DEG": args.cap_twist_deg,
+        "CAP_TWIST_NEG_DEG": args.cap_twist_neg_deg,
+        "CAP_TWIST_MOVE_JNT_VEL_SCALE": args.cap_twist_jnt_vel_scale,
         "CAP_TWIST_REPEAT_COUNT": args.cap_twist_repeat_count,
         "CAP_LIFT_Z_OFFSET_M": args.cap_lift_z_m,
         "GRIPPER_FORCE_N": args.gripper_force_n,
