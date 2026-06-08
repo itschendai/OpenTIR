@@ -18,6 +18,27 @@ import inspect
 import config
 
 
+# Operator-facing recipe phases. Each maps to one or more internal recipe
+# ``phase_*`` functions (run in listed order when stepping). The live highlight
+# follows whichever group the currently-executing internal phase belongs to.
+DISPLAY_PHASES = [
+    ("Initialization",        ["phase_startup_transfer"]),
+    ("Module Localization",   ["phase_calibrate_tags"]),
+    ("Pick Injectable",       ["phase_pick_from_camera_align_grasp"]),
+    ("Load Injectable",       ["phase_load_vise"]),
+    ("Ultrasonic Cutting",    ["phase_cut"]),
+    ("Component Disassembly", [
+        "phase_twist_and_drop_cap",
+        "phase_return_injectable_to_plate",
+        "phase_remove_spring",
+        "phase_remove_yellow_plastic",
+        "phase_remove_shell",
+        "phase_return_middle",
+        "phase_shutdown",
+    ]),
+]
+
+
 class RecipeRunner:
     def __init__(self, logger, executor, robot, machine, camera) -> None:
         self._logger = logger
@@ -28,11 +49,41 @@ class RecipeRunner:
 
         self._name: str | None = None
         self._module = None
-        self._phases: list = []        # ordered (name, fn) tuples
+        self._phases: list = []        # raw introspected (name, fn) tuples
+        self._groups: list = []        # [{"name", "members", "fns"}] display groups
         self._poses: dict = {}
         self._ctx = None
         self._ctx_speed: float | None = None
-        self._phase_index = 0
+        self._phase_index = -1         # display group running now; -1 = no highlight
+        self._next_group = 0           # cursor for the "Next Phase" button
+        # Follow the recipe's own "=== phase_* ===" log markers so the highlight
+        # advances live during run_full_recipe (which we don't drive phase-by-phase).
+        self._logger.add_observer(self._on_log)
+
+    def _on_log(self, level: str, msg: str) -> None:
+        if not self._groups:
+            return
+        m = msg.strip()
+        if not m.startswith("=== phase_"):
+            return
+        token = m[4:].split(" ===")[0].split(" (")[0].strip()
+        for gi, group in enumerate(self._groups):
+            for member in group["members"]:
+                # markers may be richer than the fn name, e.g.
+                # "phase_remove_shell_and_glass" for phase_remove_shell.
+                if token == member or token.startswith(member):
+                    self._phase_index = gi
+                    self._next_group = gi + 1
+                    return
+
+    def _build_groups(self) -> None:
+        present = {name for name, _ in self._phases}
+        by_name = dict(self._phases)
+        self._groups = []
+        for display, members in DISPLAY_PHASES:
+            fns = [(m, by_name[m]) for m in members if m in present]
+            if fns:
+                self._groups.append({"name": display, "members": members, "fns": fns})
 
     # ----- discovery -----
 
@@ -64,28 +115,26 @@ class RecipeRunner:
         self._name = name
         self._module = module
         self._phases = self._ordered_phases(module)
+        self._build_groups()
         self._ctx = None
         self._ctx_speed = None
-        self._phase_index = 0
-
-        # Load key positions for display using the recipe's own loader.
-        poses = {}
-        try:
-            args = module.parse_args([])
-            params = module.resolve_params(args)
-            key_dir = module._script_path(str(params["KEY_POSITION_DIR"]))
-            poses = module.load_positions(key_dir, self._logger)
-        except Exception as exc:  # noqa: BLE001 - display is best-effort
-            self._logger.warn(f"could not load positions for {name}: {exc}")
-        self._poses = poses
+        self._phase_index = -1   # nothing highlighted until a run starts
+        self._next_group = 0
         return self.detail()
 
     def detail(self) -> dict:
         return {
             "name": self._name,
-            "phases": [n for n, _ in self._phases],
+            "phases": [g["name"] for g in self._groups],
             "phase_index": self._phase_index,
-            "key_positions": sorted(self._poses.keys()),
+        }
+
+    def state(self) -> dict:
+        """Lightweight live state for /api/status (drives the phase highlight)."""
+        return {
+            "name": self._name,
+            "phase_index": self._phase_index,
+            "phase_count": len(self._groups),
         }
 
     # ----- context construction -----
@@ -147,40 +196,50 @@ class RecipeRunner:
                     self._logger.warn("recipe loop stopped by request")
                     break
                 self._logger.info(f"=== recipe '{self._name}' run {i + 1}/{loops} ===")
+                # Phase highlight advances via the log observer (_on_log).
                 self._module.run_full_recipe(ctx, yes=True)
-            self._phase_index = 0
+            # Finished: clear the highlight per spec (no phase highlighted at rest).
+            self._phase_index = -1
+            self._next_group = 0
         return self._executor.submit(f"recipe.run:{self._name}", op)
+
+    def _invoke_phase(self, ctx, fn) -> None:
+        # phase_cut and friends take keyword-only yes/skip_cut.
+        sig = inspect.signature(fn)
+        kwargs = {}
+        if "yes" in sig.parameters:
+            kwargs["yes"] = True
+        if "skip_cut" in sig.parameters:
+            kwargs["skip_cut"] = False
+        fn(ctx, **kwargs)
 
     def step(self, phase_name: str | None = None, speed_scale: float = 1.0) -> bool:
         if self._module is None:
             raise ValueError("no recipe selected")
-        if not self._phases:
+        if not self._groups:
             raise ValueError("recipe exposes no phases")
 
         if phase_name is None:
-            index = self._phase_index
+            gi = self._next_group
         else:
-            names = [n for n, _ in self._phases]
+            names = [g["name"] for g in self._groups]
             if phase_name not in names:
                 raise ValueError(f"unknown phase: {phase_name}")
-            index = names.index(phase_name)
-        if index >= len(self._phases):
-            index = 0
-        name, fn = self._phases[index]
+            gi = names.index(phase_name)
+        if gi >= len(self._groups):
+            gi = 0  # wrap back to the start once the last group has run
+        group = self._groups[gi]
 
         def op():
             ctx = self._ensure_ctx(speed_scale)
-            self._logger.info(f"=== recipe '{self._name}' phase: {name} ===")
-            # phase_cut and friends take keyword-only yes/skip_cut.
-            sig = inspect.signature(fn)
-            kwargs = {}
-            if "yes" in sig.parameters:
-                kwargs["yes"] = True
-            if "skip_cut" in sig.parameters:
-                kwargs["skip_cut"] = False
-            fn(ctx, **kwargs)
-            self._phase_index = index + 1
-        return self._executor.submit(f"recipe.step:{self._name}:{name}", op)
+            self._next_group = gi + 1
+            # Each internal phase logs its "=== phase_* ===" marker, which keeps
+            # the highlight on this group via _on_log.
+            for _name, fn in group["fns"]:
+                if self._executor.stop_event.is_set():
+                    break
+                self._invoke_phase(ctx, fn)
+        return self._executor.submit(f"recipe.step:{self._name}:{group['name']}", op)
 
     def stop(self) -> dict:
         self._executor.request_stop()

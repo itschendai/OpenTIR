@@ -31,11 +31,26 @@ class BufferLogger:
         self._buf: collections.deque[tuple[float, str, str]] = collections.deque(maxlen=maxlen)
         self._lock = threading.Lock()
         self._seq = 0
+        self._observers: list = []
+
+    def add_observer(self, fn) -> None:
+        """Register ``fn(level, msg)`` called on every emitted record.
+
+        Used by the recipe runner to follow ``=== phase_* ===`` markers and
+        advance the live phase highlight without disturbing the recipe flow.
+        """
+        self._observers.append(fn)
 
     def _emit(self, level: str, msg: str) -> None:
+        text = str(msg)
         with self._lock:
             self._seq += 1
-            self._buf.append((self._seq, level, str(msg)))
+            self._buf.append((self._seq, level, text))
+        for fn in self._observers:
+            try:
+                fn(level, text)
+            except Exception:  # noqa: BLE001 - an observer must never break logging
+                pass
         print(f"[{level}] {msg}", flush=True)
 
     def info(self, msg: str) -> None:

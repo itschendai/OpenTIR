@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import atexit
 import sys
+import threading
+import webbrowser
 from pathlib import Path
 
 # Make the GUI package importable when launched as `python GUI/app.py`.
@@ -48,6 +50,7 @@ def api_status():
         "executor": hub.executor.snapshot(),
         "robot": hub.robot.status(),
         "machine": hub.machine.status(),
+        "recipe": hub.recipes.state(),
     })
 
 
@@ -77,6 +80,12 @@ def api_robot_move_to():
     if not name:
         return jsonify({"error": "name required"}), 400
     return _accepted(hub.robot.move_to(name))
+
+
+@app.route("/api/robot/jog", methods=["POST"])
+def api_robot_jog():
+    body = request.json or {}
+    return _accepted(hub.robot.jog(body["axis"], float(body["delta"])))
 
 
 @app.route("/api/robot/gripper", methods=["POST"])
@@ -207,11 +216,23 @@ def api_recipe_log():
     return jsonify({"records": hub.logger.records(after_seq=after)})
 
 
+def _open_browser() -> None:
+    # localhost regardless of bind address (HOST may be 0.0.0.0).
+    url = f"http://localhost:{config.PORT}"
+    try:
+        webbrowser.open_new(url)
+    except Exception:  # noqa: BLE001 - headless / no browser is fine
+        print(f"Open the GUI at {url}", flush=True)
+
+
 def main() -> int:
     hub.start()
     atexit.register(hub.close)
+    # Pop the GUI once the server is about to accept connections. Short delay so
+    # the browser hits a live socket; runs in a thread since app.run() blocks.
+    threading.Timer(1.0, _open_browser).start()
     # threaded=True so the MJPEG stream and status polls are served concurrently.
-    # use_reloader=False so we don't double-init the hardware.
+    # use_reloader=False so we don't double-init the hardware (or open twice).
     app.run(host=config.HOST, port=config.PORT, threaded=True, use_reloader=False)
     return 0
 

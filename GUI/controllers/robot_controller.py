@@ -18,8 +18,15 @@ from helper.flexiv_helpers import (
     move_ptp_joint,
     quat_to_rpy_deg,
     read_external_wrench,
+    rotate_tcp_about_tool_axis,
+    tcp_pose_to_coord_args,
     zero_ft_sensor,
 )
+
+# Jog axis -> how it maps onto a TCP move. x/y/z translate in WORLD; rx/ry/rz
+# rotate about the tool frame (roll/pitch/yaw).
+_JOG_TRANSLATION = {"x": 0, "y": 1, "z": 2}
+_JOG_ROTATION = {"rx": "roll_deg", "ry": "pitch_deg", "rz": "yaw_deg"}
 
 # FloatingJoint primitive defaults (mirror record_robot_waypoints.py).
 _FLOAT_RESPONSE_TORQUE = [1.5, 1.5, 1.5, 1.5, 0.5, 0.5, 0.3]
@@ -135,6 +142,36 @@ class RobotController:
             move_ptp_joint(self.session, entry, vel_scale=config.MOVE_JNT_VEL_SCALE)
             self._floating = {"mode": None, "selection": []}
         return self._executor.submit(f"robot.move_to:{name}", op)
+
+    def jog(self, axis: str, delta: float) -> bool:
+        """Incremental TCP move. delta is mm for x/y/z, degrees for rx/ry/rz."""
+        axis = str(axis).lower()
+        if axis not in _JOG_TRANSLATION and axis not in _JOG_ROTATION:
+            raise ValueError(f"unknown jog axis: {axis}")
+
+        def op():
+            flexivrdk = self.session.flexivrdk
+            _, state = self.session.selected_arm_state()
+            tcp = [float(v) for v in getattr(state, "tcp_pose", [])]
+            if len(tcp) != 7:
+                raise RuntimeError("TCP pose unavailable for jog")
+            if axis in _JOG_TRANSLATION:
+                target = list(tcp)
+                target[_JOG_TRANSLATION[axis]] += float(delta) / 1000.0  # mm -> m
+            else:
+                target = rotate_tcp_about_tool_axis(
+                    tcp, **{_JOG_ROTATION[axis]: float(delta)}
+                )
+            coord_args = tcp_pose_to_coord_args(target)
+            self.session.switch_mode("NRT_PRIMITIVE_EXECUTION")
+            self.session.execute_primitive("MoveL", {
+                "target": flexivrdk.Coord(*coord_args),
+                "vel": config.ROBOT_JOG_VEL_M_S,
+                "zoneRadius": "ZFine",
+            })
+            self.session.wait_for_primitive("reachedTarget", timeout_s=30.0)
+            self._floating = {"mode": None, "selection": []}
+        return self._executor.submit(f"robot.jog:{axis}", op)
 
     def gripper_set(self, action: str) -> bool:
         from helper.flexiv_helpers import gripper_set as _gripper_set

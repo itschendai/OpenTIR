@@ -27,6 +27,8 @@ GRIPPER_CLOSE_FORCE_N = 40.0
 
 # Velocity scale (1-100) for move-to-waypoint MovePTP from the control panel.
 MOVE_JNT_VEL_SCALE = 20
+# TCP linear velocity (m/s) for jog moves from the Robot Controls panel.
+ROBOT_JOG_VEL_M_S = 0.05
 
 # ----- camera (Intel RealSense D405) -----
 CAMERA_SERIAL = "323622271112"

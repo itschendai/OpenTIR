@@ -39,6 +39,7 @@ async function pollStatus() {
     renderExecutor(s.executor);
     renderRobot(s.robot);
     renderMachine(s.machine);
+    renderRecipeState(s.recipe);
   } catch (e) {
     flashBanner("status unreachable", "error");
   }
@@ -73,6 +74,12 @@ function renderRobot(r) {
 }
 
 function renderMachine(m) {
+  const st = $("machine-state");
+  if (!m.connected) { st.textContent = "offline"; st.className = "pill"; }
+  else if (m.faulted) { st.textContent = "FAULT"; st.className = "pill fault"; }
+  else if (m.homed) { st.textContent = "operational"; st.className = "pill ok"; }
+  else { st.textContent = "not homed"; st.className = "pill"; }
+
   const fx = (v, n = 1) => (v == null ? "—" : Number(v).toFixed(n));
   $("m-x").textContent = fx(m.x_mm);
   $("m-z").textContent = fx(m.z_mm);
@@ -132,6 +139,18 @@ async function loadRecipe() {
   renderRecipe(detail);
 }
 
+// Live highlight, driven by /api/status (works for both Run Full and Next Phase).
+function renderRecipeState(r) {
+  if (!r || !currentRecipe || r.name !== currentRecipe.name) return;
+  updatePhaseHighlight(r.phase_index);
+}
+
+function updatePhaseHighlight(index) {
+  document.querySelectorAll("#recipe-phases li").forEach((li, i) => {
+    li.classList.toggle("current", i === index);
+  });
+}
+
 function renderRecipe(d) {
   const phases = $("recipe-phases");
   phases.innerHTML = "";
@@ -140,13 +159,6 @@ function renderRecipe(d) {
     li.textContent = p;
     if (i === d.phase_index) li.className = "current";
     phases.appendChild(li);
-  });
-  const pos = $("recipe-positions");
-  pos.innerHTML = "";
-  (d.key_positions || []).forEach((p) => {
-    const li = document.createElement("li");
-    li.textContent = p;
-    pos.appendChild(li);
   });
 }
 
@@ -202,16 +214,24 @@ const ACTIONS = {
     if (!confirm("Run the full recipe? The cell will move autonomously.")) return;
     await post("/api/recipe/run", { speed: speed(), loops: parseInt($("loops").value) || 1 });
   },
-  "recipe-step": async () => {
-    await post("/api/recipe/step", { speed: speed() });
-    setTimeout(loadRecipe, 300);  // refresh phase index
-  },
+  "recipe-step": () => post("/api/recipe/step", { speed: speed() }),
   "recipe-stop": () => post("/api/recipe/stop"),
 };
+
+function doJog(axis, dir) {
+  const isRot = axis.startsWith("r");
+  const step = parseFloat($(isRot ? "jog-deg" : "jog-mm").value);
+  if (!isFinite(step)) return;
+  post("/api/robot/jog", { axis, delta: dir * step });
+}
 
 document.addEventListener("click", (e) => {
   const btn = e.target.closest("[data-act]");
   if (!btn) return;
+  if (btn.dataset.act === "jog") {
+    doJog(btn.dataset.axis, parseInt(btn.dataset.dir, 10));
+    return;
+  }
   const fn = ACTIONS[btn.dataset.act];
   if (fn) fn();
 });

@@ -28,6 +28,14 @@ Speed legend (values come from `PARAMS` in `recipe.py`):
   `FRAME5_CARTESIAN_VEL_M_S = 0.5` m/s. Set `FRAME5_FAST_ENABLED = False` to make
   frame 5 fall back to the frames 1-4 speeds.
 
+Phases:
+Initialization
+Module Localization
+Pick Injectable
+Load Injectable
+Ultrasonic Cutting
+Component Disassembly
+
 //frame 1
 1. Robot opens gripper. — gripper 0.05 m/s (`GRIPPER_VELOCITY_M_S`)
 2. Robot moves to Middle point. — MovePTP @ 80% joint-vel scale (no fixed m/s)

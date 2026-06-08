@@ -134,14 +134,44 @@ header {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 2fr 1fr 0.85fr;
+  grid-template-areas:
+    "camera robot-status machine-status"
+    "camera robot-ctrl   machine-ctrl"
+    "recipe recipe       recipe"
+    "log    log          log";
   gap: 1rem;
   padding: 1rem 1.25rem 2rem;
-  max-width: 1500px;
+  max-width: 1600px;
   margin: 0 auto;
 }
-@media (max-width: 1080px) { .grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
-@media (max-width: 720px)  { .grid { grid-template-columns: 1fr; } }
+.area-camera         { grid-area: camera; }
+.area-robot-status   { grid-area: robot-status; }
+.area-machine-status { grid-area: machine-status; }
+.area-robot-ctrl     { grid-area: robot-ctrl; }
+.area-machine-ctrl   { grid-area: machine-ctrl; }
+.area-recipe         { grid-area: recipe; }
+.area-log            { grid-area: log; }
+
+@media (max-width: 1080px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "camera camera"
+      "robot-status machine-status"
+      "robot-ctrl   machine-ctrl"
+      "recipe recipe"
+      "log log";
+  }
+}
+@media (max-width: 720px) {
+  .grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "camera" "robot-status" "machine-status"
+      "robot-ctrl" "machine-ctrl" "recipe" "log";
+  }
+}
 
 .panel {
   background: linear-gradient(180deg, var(--panel), var(--panel-2));
@@ -150,7 +180,22 @@ header {
   padding: 1rem 1.1rem 1.1rem;
   box-shadow: 0 1px 0 rgba(255,255,255,0.02) inset, 0 6px 18px rgba(0,0,0,0.25);
 }
-.panel.wide { grid-column: 1 / -1; }
+
+/* jog pad: [axis] [−] [+] per row */
+.jog {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr 1fr;
+  gap: 0.35rem;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+.jog .jog-axis {
+  font-family: ui-monospace, monospace;
+  font-size: 0.76rem;
+  color: var(--muted);
+  letter-spacing: 0.03em;
+}
+.jog .btn { padding: 0.34rem 0; text-align: center; font-weight: 600; }
 
 .panel h2 {
   margin: 0 0 0.9rem;
@@ -182,14 +227,37 @@ header {
 
 /* ---------- camera ---------- */
 
-#camera {
+/* Top-aligned so the camera keeps its natural 4:3 size instead of stretching to
+   the full height of the stacked status+controls panels on the right. */
+.area-camera { display: flex; flex-direction: column; align-self: start; }
+/* Frame matches the actual RGB stream aspect (640x480 = 4:3), same framing used
+   for tag / injectable detection — so the whole frame is shown, no cropping. */
+.cam-frame {
+  position: relative;
   width: 100%;
   aspect-ratio: 4 / 3;
-  object-fit: contain;
-  background:
-    repeating-linear-gradient(45deg, #161616 0 10px, #191919 10px 20px);
-  border: 1px solid var(--line);
   border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #0f0f0f;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04),
+              inset 0 0 60px rgba(0,0,0,0.45);
+}
+#camera {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.cam-frame::after {  /* faint live indicator dot, top-right */
+  content: "";
+  position: absolute;
+  top: 0.6rem; right: 0.6rem;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(133,192,134,0.18), 0 0 10px var(--accent);
 }
 
 /* ---------- controls ---------- */
@@ -214,9 +282,9 @@ header {
   color: var(--ink);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
-  padding: 0.46rem 0.8rem;
+  padding: 0.4rem 0.65rem;
   font: inherit;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   cursor: pointer;
   transition: border-color 0.14s, color 0.14s, background 0.14s;
 }
@@ -247,8 +315,8 @@ select, input[type="number"] {
   font: inherit;
   font-size: 0.8rem;
 }
-select { min-width: 10rem; }
-input[type="number"] { width: 6em; }
+select { min-width: 7rem; max-width: 100%; }
+input[type="number"] { width: 5em; }
 select:focus, input:focus {
   outline: none;
   border-color: var(--accent);
@@ -269,20 +337,23 @@ input[type="range"] {
 table.kv { width: 100%; border-collapse: collapse; }
 table.kv tr + tr th, table.kv tr + tr td { border-top: 1px solid var(--line-soft); }
 table.kv th {
+  width: 44%;
   text-align: left;
   color: var(--muted);
   font-weight: 500;
   font-size: 0.74rem;
   padding: 0.42rem 0.6rem 0.42rem 0;
   white-space: nowrap;
-  vertical-align: middle;
+  vertical-align: top;
 }
+table.kv { table-layout: fixed; }
 table.kv td {
   font-family: ui-monospace, "SF Mono", "JetBrains Mono", monospace;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: var(--ink);
   padding: 0.42rem 0;
   text-align: right;
+  overflow-wrap: anywhere;   /* let the joints list wrap to 2-3 lines */
 }
 
 .status-line { margin-bottom: 0.7rem; }
@@ -302,38 +373,60 @@ table.kv td {
 
 /* ---------- recipe ---------- */
 
-.recipe-body {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-top: 0.4rem;
+/* horizontal phase stepper */
+.phase-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 0.3rem 0 0;
+  counter-reset: phase;
 }
-@media (max-width: 720px) { .recipe-body { grid-template-columns: 1fr; } }
-
-.recipe-body ol, .recipe-body ul {
-  margin: 0;
-  padding-left: 1.2rem;
+.phase-list li {
+  counter-increment: phase;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 0.8rem;
   color: var(--muted);
-  line-height: 1.7;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.32rem 0.85rem 0.32rem 0.32rem;
 }
-.recipe-body li { font-family: ui-monospace, monospace; }
-#recipe-phases li.current {
+.phase-list li::before {
+  content: counter(phase);
+  flex: 0 0 auto;
+  width: 1.4rem; height: 1.4rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ui-monospace, monospace;
+  font-size: 0.7rem;
+  color: var(--faint);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+}
+.phase-list li.current {
   color: var(--accent);
   font-weight: 600;
-  list-style: none;
-  margin-left: -1.2rem;
-  padding-left: 0.5rem;
-  border-left: 2px solid var(--accent);
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+}
+.phase-list li.current::before {
+  color: #11150f;
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 #recipe-log {
-  margin: 0.4rem 0 0;
+  margin: 0;
   background: var(--bg-2);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   padding: 0.7rem 0.85rem;
-  max-height: 210px;
+  max-height: 260px;
   overflow-y: auto;
   font-family: ui-monospace, "SF Mono", "JetBrains Mono", monospace;
   font-size: 0.74rem;
