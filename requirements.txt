@@ -1,0 +1,30 @@
+# OpenTIR project dependencies — tested with Python 3.12 (works on 3.10+).
+# Rebuild the environment with:
+#   python -m venv .venv
+#   source .venv/bin/activate        # Windows: .venv\Scripts\activate
+#   pip install -r requirements.txt
+#
+# NOTE: 'segment-anything' is not on PyPI — install it separately (see README),
+# and download its model checkpoint (sam_vit_h_4b8939.pth) manually.
+
+# --- Flexiv robot SDK ---
+flexivrdk
+spdlog
+
+# --- Vision / camera ---
+opencv-python
+pyrealsense2
+numpy
+matplotlib
+
+# --- Hardware I/O ---
+pyserial>=3.5
+
+# --- Config / data ---
+pyyaml>=6.0
+
+# --- GUI ---
+flask>=3.0
+
+# --- Testing ---
+pytest>=7.0
