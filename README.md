@@ -42,6 +42,7 @@ stays small:
 | `gripper_open_close.py` | Gripper control helper |
 | `calibration/` | Eye-in-hand calibration scripts and configs |
 | `camera/` | RealSense camera capture utilities |
+| `arduino/` | PlatformIO firmware for the Arduino-controlled X/Z stage and cutter hardware |
 | `GUI/` | Flask-based control GUI |
 | `Simulation/` | Flexiv Element motion simulation helpers for recipe motions |
 | `recipe/` | Recipe definitions and per-recipe key positions |
@@ -57,5 +58,7 @@ python record_robot_waypoints.py
 python play_recorded_waypoints.py
 python Simulation/greenpink_fast_element_sim.py --dry-run
 ```
+
+For the Arduino stage firmware, see `arduino/xz-stage-code-v2/`.
 
 For the GUI, see `GUI/` (a Flask app; `GUI/requirements.txt` notes its extra dependency).
