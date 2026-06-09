@@ -4,9 +4,9 @@ This is the shared recipe-development guide for scripts under `project/recipe/`.
 Individual recipe folders should keep their own notes focused on the actual object,
 poses, robot moves, and Arduino/cutting-machine actions for that recipe.
 
-## What We Learned From `injectable_pipeline`
+## Reusable Recipe Patterns
 
-The injectable pipeline has several patterns worth keeping:
+These recipes share a few patterns worth keeping:
 
 - Keep hardware plumbing out of recipes. Robot setup, primitive dispatch, gripper
   moves, quaternion math, force descent, and Arduino serial commands belong in
@@ -24,7 +24,7 @@ The injectable pipeline has several patterns worth keeping:
 
 ## Shared Helper Layer
 
-Reusable code copied forward from `project/injectable_pipeline/` lives in:
+Reusable code lives in:
 
 ```text
 project/helper/
@@ -34,8 +34,7 @@ project/helper/
 ```
 
 Recipe scripts should import from this helper layer instead of reimplementing
-functions from `record_robot_waypoints.py`, `play_recorded_waypoints.py`, or the
-injectable scripts.
+functions from `record_robot_waypoints.py` or `play_recorded_waypoints.py`.
 
 Most useful helpers:
 
@@ -48,9 +47,9 @@ Most useful helpers:
   conversion.
 - `ArduinoClient` for vise, cutter, and machine-state coordination.
 
-## Lessons From `LLM.txt` And `example_py`
+## Lessons From `example_py`
 
-The Flexiv examples and `project/LLM.txt` point to a reliable robot-side lifecycle:
+The Flexiv examples point to a reliable robot-side lifecycle:
 
 1. Create the robot connection.
 2. Clear robot fault if one is present.
@@ -78,7 +77,7 @@ Examples to learn from:
   contact search, set a max contact wrench, move slowly, poll external wrench,
   and stop when contact is detected.
 
-Important API constraints from `LLM.txt`:
+Important API constraints for this repo:
 
 - The project default robot serial is `Rizon4-062930`.
 - RDK robot Cartesian distances are in meters.

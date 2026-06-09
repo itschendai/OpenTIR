@@ -58,7 +58,6 @@ stays small:
 | `recipe/` | Recipe definitions and per-recipe key positions |
 | `helper/` | Shared helper modules |
 | `key_positions/` | Saved robot key positions |
-| `injectable_pipeline_archived/` | Archived injectable-processing pipeline |
 
 ## Running
 

@@ -69,8 +69,7 @@ PARAMS: dict[str, Any] = {
     "CAP_TWIST_NEG_DEG": -10.0,
     "CAP_TWIST_MOVE_JNT_VEL_SCALE": 20,
     "CAP_TWIST_REPEAT_COUNT": 1,
-    # Wiggle defaults come from the archived break-off phase:
-    # project/injectable_pipeline_archived/recipe.py
+    # Wiggle defaults come from earlier break-off experiments.
     "WIGGLE_PIVOT_OFFSET_CM": 6.0,
     "WIGGLE_YAW_DEG": 15.0,
     "WIGGLE_REPEAT_COUNT": 2,

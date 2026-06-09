@@ -26,6 +26,7 @@ calibration/holdout/
 *.bak
 *.tmp
 *.log
+recipe/**/*.lock
 
 # --- OS / editor cruft ---
 .DS_Store
