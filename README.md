@@ -54,6 +54,7 @@ stays small:
 | `calibration/` | Eye-in-hand calibration scripts and configs |
 | `camera/` | RealSense camera capture utilities |
 | `GUI/` | Flask-based control GUI |
+| `Simulation/` | Flexiv Element motion simulation helpers for recipe motions |
 | `recipe/` | Recipe definitions and per-recipe key positions |
 | `helper/` | Shared helper modules |
 | `key_positions/` | Saved robot key positions |
@@ -66,6 +67,7 @@ Activate the venv first (`source .venv/bin/activate`), then run the relevant scr
 ```bash
 python record_robot_waypoints.py
 python play_recorded_waypoints.py
+python Simulation/greenpink_fast_element_sim.py --dry-run
 ```
 
 For the GUI, see `GUI/` (a Flask app; `GUI/requirements.txt` notes its extra dependency).

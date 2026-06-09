@@ -31,3 +31,4 @@ calibration/holdout/
 .DS_Store
 Thumbs.db
 *.swp
+.claude/
