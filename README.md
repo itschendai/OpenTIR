@@ -4,6 +4,8 @@ Robotics automation project built on the [Flexiv RDK](https://github.com/flexivr
 combining robot waypoint recording/playback, RealSense camera vision, eye-in-hand
 calibration, and a recipe-driven pipeline with a Flask GUI.
 
+This repo was developed for the Stanford `CS225A Experimental Robotics` Spring 2026 class.
+
 ## Requirements
 
 - Python **3.10+** (developed on 3.12)
@@ -22,18 +24,6 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### Segment Anything (SAM)
-
-Some vision code uses Meta's Segment Anything, which is **not on PyPI** and is **not
-committed to this repo**. Install it and download the model checkpoint separately:
-
-```bash
-pip install git+https://github.com/facebookresearch/segment-anything.git
-
-# Download the ViT-H checkpoint (~2.4 GB) into the project root:
-wget https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth
-```
-
 ## What's not in this repo
 
 The `.gitignore` intentionally excludes regenerable / large artifacts so the repo
@@ -42,7 +32,6 @@ stays small:
 - `.venv/` — virtual environment (rebuild with the steps above)
 - `__pycache__/`, `.pytest_cache/` — Python caches
 - `*.mp4` and `calibration/captures|samples|holdout/` — large media/capture data
-- the SAM model checkpoint (`sam_vit_h_4b8939.pth`)
 
 ## Project layout
 
